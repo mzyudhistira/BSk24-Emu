@@ -1,2 +1,9 @@
 # Big Files
 input/literature_data/
+
+# Python
+input/__pycache__
+model/__pycache__
+output/__pycache__
+training/__pycache__
+__pycache__
