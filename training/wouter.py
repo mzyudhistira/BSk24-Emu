@@ -8,7 +8,7 @@ import psutil
 import GPUtil
 
 # Internal Library
-from model_building import *
+from model import *
 
 class ResourceUsageCallback(Callback):
     def __init__(self):
@@ -35,8 +35,8 @@ class ResourceUsageCallback(Callback):
         print(f"Epoch {epoch + 1}: CPU Usage: {cpu}%, GPU Usage: {gpu_load}%")
 
 def write_loss(history, name):
-    np.savetxt(f'/training/loss/{name}.loss.dat', history.history['loss'])
-    np.savetxt(f'/training/loss/{name}.val_loss.dat', history.history['val_loss'])
+    np.savetxt(f'training/loss/{name}.loss.dat', history.history['loss'])
+    np.savetxt(f'training/loss/{name}.val_loss.dat', history.history['val_loss'])
 
 def write_perf_log(log, name, file = 'training/performance_benchmark/individual_training.dat'):
     new_line = f"\n{name};{log['training_time']};{log['avg_cpu_usage']};{log['avg_gpu_usage']}"
@@ -168,6 +168,6 @@ def fine_grain_training(model, train_dat, val_dat, batch_number = [32, 16, 4], e
     avg_gpu_usage = np.mean([item['avg_gpu_usage'] for item in performance_logs])
     performance_log = {'training_time' : total_training_time, 'avg_cpu_usage' : avg_cpu_usage, 'avg_gpu_usage' : avg_gpu_usage}
     
-    write_perf_log(performance_log, training_name, 'performance_benchmark/fine_grain_training.dat')    
+    write_perf_log(performance_log, training_name, 'training/performance_benchmark/fine_grain_training.dat')    
 
     return history[0], history[1], history[2], bestfname

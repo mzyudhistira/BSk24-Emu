@@ -45,29 +45,41 @@ def format_bsk24_varians(file):
 """
 Read the data
 """
-def get_bsk24_data():
-    df = pd.read_csv('input/literature_data/hfb24-dat', sep=r"\s+")
+def get_bsk24():
+    df = pd.read_csv('input/literature_data/bsk24.csv', sep=';')
+    
+    return df
+
+def get_bsk24_mass_table():
+    df = pd.read_csv('input/literature_data/bsk24_mass_table.csv', sep=';')
 
     return df
 
-def get_bsk24_varians():
-    df = pd.read_csv('input/literature_data/formatted_bsk24_varians.dat', sep=';')
+def get_bsk24_experimental_mass_table():
+    df = pd.read_csv('input/literature_data/bsk24_mass_table_exp.csv', sep=';')
 
     return df
 
-def get_bsk24_varians_sample():
-    df = pd.read_csv('input/literature_data/sample_bsk24_varians.dat', sep=';')
+def get_bsk24_varians(full_data=False):
+    dir = 'input/literature_data/'
+    if full_data == True:
+        file = 'bsk24_varians.parquet'
+        df = pd.read_parquet(dir+file)
+
+    else:
+        file = 'bsk24_varians_sample.csv'
+        df = pd.read_csv(dir+file, sep=';')
 
     return df
 
-def get_bsk24_varian_mass_table(varian):
-    mass_dict = ast.literal_eval(varian['mass_table'])
-    mass_table = pd.DataFrame(mass_dict)
+def get_bsk24_varians_mass_table(full_data=False):
+    dir = 'input/literature_data/'
 
-    return mass_table
+    if full_data == False:
+        file = 'bsk24_varians_sample_mass_table.csv' 
+        df = pd.read_csv(dir+file, sep=';')
+    else:
+        file = 'bsk24_varians_mass_table.parquet'
+        df = pd.read_parquet(dir+file)
 
-def random_sampling(data, sample_number):
-    np.random.shuffle(data)
-    sample = data[:sample_number]
-
-    return sample
+    return df
