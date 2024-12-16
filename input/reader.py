@@ -1,6 +1,14 @@
+"""
+Loading the libraries
+"""
+# External
 import pandas as pd
 import numpy as np
-import ast
+
+# Internal
+from config import *
+
+input_data_dir = DATA_DIR/"input"
 
 """
 Format data to pandas readable format
@@ -46,40 +54,38 @@ def format_bsk24_varians(file):
 Read the data
 """
 def get_bsk24():
-    df = pd.read_csv('input/literature_data/bsk24.csv', sep=';')
+    df = pd.read_csv(input_data_dir/"bsk24.csv", sep=';')
     
     return df
 
 def get_bsk24_mass_table():
-    df = pd.read_csv('input/literature_data/bsk24_mass_table.csv', sep=';')
+    df = pd.read_csv(input_data_dir/'bsk24_mass_table.csv', sep=';')
 
     return df
 
 def get_bsk24_experimental_mass_table():
-    df = pd.read_csv('input/literature_data/bsk24_mass_table_exp.csv', sep=';')
+    df = pd.read_csv(input_data_dir/'bsk24_mass_table_exp.csv', sep=';')
 
     return df
 
 def get_bsk24_varians(full_data=False):
-    dir = 'input/literature_data/'
     if full_data == True:
         file = 'bsk24_varians.parquet'
-        df = pd.read_parquet(dir+file)
+        df = pd.read_parquet(input_data_dir/file)
 
     else:
         file = 'bsk24_varians_sample.csv'
-        df = pd.read_csv(dir+file, sep=';')
+        df = pd.read_csv(input_data_dir/file, sep=';')
 
     return df
 
 def get_bsk24_varians_mass_table(full_data=False):
-    dir = 'input/literature_data/'
 
     if full_data == False:
         file = 'bsk24_varians_sample_mass_table.csv' 
-        df = pd.read_csv(dir+file, sep=';')
+        df = pd.read_csv(input_data_dir/file, sep=';')
     else:
         file = 'bsk24_varians_mass_table.parquet'
-        df = pd.read_parquet(dir+file)
+        df = pd.read_parquet(input_data_dir/file)
 
     return df

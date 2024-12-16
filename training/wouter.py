@@ -9,6 +9,9 @@ import GPUtil
 
 # Internal Library
 from model import *
+from config import *
+
+training_data_dir = DATA_DIR/"training"
 
 class ResourceUsageCallback(Callback):
     def __init__(self):
@@ -35,29 +38,15 @@ class ResourceUsageCallback(Callback):
         print(f"Epoch {epoch + 1}: CPU Usage: {cpu}%, GPU Usage: {gpu_load}%")
 
 def write_loss(history, name):
-    np.savetxt(f'training/loss/{name}.loss.dat', history.history['loss'])
-    np.savetxt(f'training/loss/{name}.val_loss.dat', history.history['val_loss'])
+    np.savetxt(training_data_dir/'loss'/f'{name}.loss.dat', history.history['loss'])
+    np.savetxt(training_data_dir/'loss'/f'{name}.val_loss.dat', history.history['val_loss'])
 
-def write_perf_log(log, name, file = 'training/performance_benchmark/individual_training.dat'):
+def write_perf_log(log, name, file = training_data_dir/'performance_benchmark'/'individual_training.dat'):
     new_line = f"\n{name};{log['training_time']};{log['avg_cpu_usage']};{log['avg_gpu_usage']}"
 
     with open(file, 'a') as f:
         f.write(new_line)
     
-def binding_energy_loss_score(data, prediction):
-    """
-    Custom loss function used to measure the binding energy prediction
-    """
-
-    correlation, p_value = stats.pearsonr(data, prediction)
-    diff = data - prediction
-    mse = diff**2
-    variance = np.var(diff)
-
-    score = correlation**2 / np.log10(mse * variance)
-
-    return score
-
 def model_training(training_name, model, training_data, validation_data, batch, epoch, weights_file = '',
                    save_perf_log = False, save_loss = True):
     """
@@ -81,8 +70,8 @@ def model_training(training_name, model, training_data, validation_data, batch, 
         - performance_log: training performance
     """
 
-    best_weights = f'training/weight_best/{training_name}.weights.h5'
-    last_weights = f'training/weight_training/{training_name}.weights.h5'
+    best_weights = training_data_dir/'weight_best'/f'{training_name}.weights.h5'
+    last_weights = training_data_dir/'weight_training'/f'{training_name}.weights.h5'
 
     feature = training_data[:,:-1]
     target = training_data[:,-1]
@@ -168,6 +157,6 @@ def fine_grain_training(model, train_dat, val_dat, batch_number = [32, 16, 4], e
     avg_gpu_usage = np.mean([item['avg_gpu_usage'] for item in performance_logs])
     performance_log = {'training_time' : total_training_time, 'avg_cpu_usage' : avg_cpu_usage, 'avg_gpu_usage' : avg_gpu_usage}
     
-    write_perf_log(performance_log, training_name, 'training/performance_benchmark/fine_grain_training.dat')    
+    write_perf_log(performance_log, training_name, training_data_dir/'performance_benchmark'/'fine_grain_training.dat')
 
     return history[0], history[1], history[2], bestfname

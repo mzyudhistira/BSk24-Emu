@@ -1,5 +1,6 @@
 # Big Files
 input/literature_data/
+data/
 
 # Python
 input/__pycache__
