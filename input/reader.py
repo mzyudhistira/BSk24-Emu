@@ -13,42 +13,47 @@ input_data_dir = DATA_DIR/"input"
 """
 Format data to pandas readable format
 """
-def format_bsk24_varians(file):
-    # Get the parameters tab
-    params = pd.read_csv(file, nrows=43, sep=r"\s+", header=None).T
+def format_mass_all_extrap(file):
+    """
+    format the extrapolated mass data, return parameter and mass table dataframe
+    """
+    # Extract the parameters on the top of the file
+    params_up = pd.read_csv(file, nrows=44, sep=r"\s+", header=None).T
+    header_up = params_up.head(1).values.tolist()[0]
+    for i in range(23,44,3):
+        header_up[i+2] = header_up[i+2] + '_' + header_up[i]
+
+    params_up.columns = header_up
+    params_up = params_up.drop(0)
+    params_up['sampling'] = params_up['sampling'].astype(int)
+
+    # Extract the bottom parameters
+    params_dn = pd.read_csv(file, skiprows=6472, sep=r"\s+", header=None).T
+    header_dn = params_dn.head(1).values.tolist()[0]
+    params_dn.columns = header_dn
+    params_dn = params_dn.drop(0)
+    params_dn['sampling'] = params_up['sampling'].astype(int)
+    params_dn = params_dn.rename(columns={'sigma':'sigma_rms'})
     
-    header_row = params.head(1).values.tolist()[0]
-    params.columns = header_row
-    params = params.drop(0)
-    params['sampling'].astype(int)
+    # Combine both parameter dataframes
+    params = pd.merge(params_up, params_dn, how="inner", on="sampling")
+    params = params.rename(columns={'sampling':'varian_id'})
 
-    # Get the mass tables
-    mass_dict = []
-    i = 1
+    # Extract the mass table
+    mass_table = pd.read_csv(ext_data_path, skiprows=46, nrows=6473-48, sep=r'\s+', header=None)
+    mass_table_header = ['Z', 'N', 'A'] + list(range(1,11023))
+    mass_table.columns = mass_table_header
+    mass_table = pd.melt(
+        mass_table,
+        id_vars = ['Z', 'N', 'A'],
+        var_name = 'varian_id',
+        value_name = 'm'
+    )
 
-    for col in mass_table.loc[:, 'sample_1':'sample_32119']:
-        sample_mass_table = mass_table[['Z', 'N', 'A', f'sample_{i}']]
-        sample_mass_table = sample_mass_table.rename(columns={f'sample_{i}':'mass'})
-        formatted_dict = sample_mass_table.to_dict()
+    # Reorder the header
+    mass_table = mass_table[['varian_id', 'Z', 'N', 'A', 'm']]
 
-        mass_dict.append(formatted_dict)
-        i += 1
-
-    # Get the rms result
-    rms_data = pd.read_csv(file, skiprows=774, sep=r"\s+", header=None).T
-    header_row = rms_data.head(1).values.tolist()[0]
-    rms_data.columns = header_row
-    rms_data = rms_data.drop(0)
-
-    # Combine it to a single df
-    combined_data = pd.concat([params, rms_data], axis=1)
-    combined_data['mass_table'] = mass_dict
-
-    # Export to pandas readable format
-    combined_data.to_csv('input/formatted_bsk24_varians.dat', sep=';', index=False)
-
-    return
-
+    return params, mass_table
 
 """
 Read the data
