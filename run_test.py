@@ -30,7 +30,7 @@ bsk24_varians_mass_table = BSk24_VARIANS_MASS_TABLE
 # Sampling the varian
 varian_number = 7 # Pick any number between 1 and 10
 selected_varian = select_varian(varian_number)
-selected_varian_sample = selected_varian.sample(frac=0.2).reset_index(drop=True)
+selected_varian_sample = selected_varian.sample(frac=0.7).reset_index(drop=True)
 
 Z_bsk24 = bsk24_mass_table['Z']
 N_bsk24 = bsk24_mass_table['N']
@@ -72,7 +72,7 @@ model.summary()
 Start training model
 '''
 # Training the model
-training_label = 'test_var7_unscaledInput'
+training_label = 'test_var7_unscaledInput_70%'
 
 with tf.device('/GPU:0'):
     history_1, history_2, history_3, best_weights = fine_grain_training(model, data_train, data_val, batch_number=[32, 16, 4],
