@@ -23,14 +23,15 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Generate input data
 bsk24_param = BSk24
-bsk24_mass_table = BSk24_EXPERIMENTAL_MASS_TABLE
+# bsk24_mass_table = BSk24_MASS_TABLE
+bsk24_mass_table = pd.concat([BSk24_MASS_TABLE] * 12, ignore_index=True) #dummy data
 bsk24_varians_param = BSk24_VARIANS
 bsk24_varians_mass_table = BSk24_VARIANS_MASS_TABLE
 
 # Sampling the varian
 varian_number = 7 # Pick any number between 1 and 10
 selected_varian = select_varian(varian_number)
-selected_varian_sample = selected_varian.sample(frac=0.7).reset_index(drop=True)
+selected_varian_sample = selected_varian.sample(frac=0.8).reset_index(drop=True)
 
 Z_bsk24 = bsk24_mass_table['Z']
 N_bsk24 = bsk24_mass_table['N']
@@ -38,10 +39,7 @@ m_bsk24 = bsk24_mass_table['m']
 param_bsk24 = BSk24.to_numpy()
 param_bsk24 = np.tile(param_bsk24, (len(Z_bsk24), 1))
 
-Z_bsk24_varian = selected_varian_sample['Z']
-N_bsk24_varian = selected_varian_sample['N']
-m_bsk24_varian = selected_varian_sample['m']
-params_bsk24_varian = selected_varian_sample.iloc[:,5:26].to_numpy()
+Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = extract_varian_data(selected_varian_sample)
 
 # Generate the input date
 Z = np.concatenate((Z_bsk24, Z_bsk24_varian))
@@ -72,7 +70,7 @@ model.summary()
 Start training model
 '''
 # Training the model
-training_label = 'test_var7_unscaledInput_70%'
+training_label = 'test_dummy_data_96000row'
 
 with tf.device('/GPU:0'):
     history_1, history_2, history_3, best_weights = fine_grain_training(model, data_train, data_val, batch_number=[32, 16, 4],
@@ -85,10 +83,7 @@ Generating mass tables
 model = wouter_model(N_input, 'adadelta')
 model.load_weights(best_weights)
 
-Z_bsk24_varian = selected_varian['Z']
-N_bsk24_varian = selected_varian['N']
-m_bsk24_varian = selected_varian['m']
-params_bsk24_varian = selected_varian.iloc[:,5:26].to_numpy()
+Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = extract_varian_data(selected_varian)
 
 test_input, N_test_input = modified_wouter(Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian)
 generate_mass_table(model, test_input, training_label)

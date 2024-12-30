@@ -19,7 +19,7 @@ def select_input(data, N_train, N_val, N_test):
      N_test : number of testing data
 
    Output:
-     train_dat : training data, first N_train rows in data
+
      test_dat  : testing data, last N_test rows in data
      val_dat   : validation data
 
@@ -75,7 +75,7 @@ def split_input(data, percent_train, percent_val, percent_test):
   
   return split_arrays[0], split_arrays[1], split_arrays[2]
 
-def extract_data(df):
+def extract_varian_data(df):
   """
   Extracting the Z, N, mass, and skyrme parameters from a varian dataframe
   """
