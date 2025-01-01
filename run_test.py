@@ -7,6 +7,7 @@ import pandas as pd
 from keras import models, layers, callbacks
 import os
 import tensorflow as tf
+import random
 
 #Internal Library
 from input import *
@@ -23,15 +24,17 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Generate input data
 bsk24_param = BSk24
-# bsk24_mass_table = BSk24_MASS_TABLE
-bsk24_mass_table = pd.concat([BSk24_MASS_TABLE] * 12, ignore_index=True) #dummy data
+bsk24_mass_table = BSk24_EXPERIMENTAL_MASS_TABLE
 bsk24_varians_param = BSk24_VARIANS
 bsk24_varians_mass_table = BSk24_VARIANS_MASS_TABLE
 
 # Sampling the varian
-varian_number = 7 # Pick any number between 1 and 10
+# varian_number = [1,2,4,5,7,8,9,10] # Pick any number between 1 and 10
+number_of_sample = 16
+varian_number = random_integers = random.sample(range(1, 32000), number_of_sample)
 selected_varian = select_varian(varian_number)
-selected_varian_sample = selected_varian.sample(frac=0.8).reset_index(drop=True)
+print(selected_varian.shape)
+selected_varian_sample = selected_varian.sample(frac=0.2).reset_index(drop=True)
 
 Z_bsk24 = bsk24_mass_table['Z']
 N_bsk24 = bsk24_mass_table['N']
@@ -70,7 +73,7 @@ model.summary()
 Start training model
 '''
 # Training the model
-training_label = 'test_dummy_data_96000row'
+training_label = f'Test {number_of_sample} varians w 0.2% sample on exp mass'
 
 with tf.device('/GPU:0'):
     history_1, history_2, history_3, best_weights = fine_grain_training(model, data_train, data_val, batch_number=[32, 16, 4],

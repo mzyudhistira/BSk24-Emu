@@ -89,10 +89,19 @@ def extract_varian_data(df):
 
 def select_varian(varian_number):
     """
-    Select one varian from the whole BSk24 variations
+    Select varian(s) from the whole BSk24 variations, the input should be a single integer or a list of integers
     """
-    varian_param = BSk24_VARIANS[BSk24_VARIANS['varian_id']==varian_number]
-    varian_mass_table = BSk24_VARIANS_MASS_TABLE[BSk24_VARIANS_MASS_TABLE['varian_id']==varian_number]
+    # Check the input data type
+    if isinstance(varian_number, int):
+        varian_number = [varian_number]
+    
+    # Select the varians
+    varian_list = pd.DataFrame({'varian_id': varian_number})
+
+    varian_param = pd.merge(BSk24_VARIANS, varian_list, on='varian_id', how='inner')
+    varian_mass_table = pd.merge(BSk24_VARIANS_MASS_TABLE, varian_list, on='varian_id', how='inner')
+    
+    # Merge the parameter and mass table
     selected_varian = pd.merge(varian_mass_table, varian_param, on='varian_id')
     
     # Fix varian parameter x_2 to t_2.x_2
