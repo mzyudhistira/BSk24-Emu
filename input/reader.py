@@ -94,3 +94,26 @@ def get_bsk24_varians_mass_table(full_data=False):
         df = pd.read_parquet(input_data_dir/file)
 
     return df
+
+def get_bsk24_varians_ext():
+    file = 'bsk24_varians_ext_sample.parquet' 
+    df = pd.read_parquet(input_data_dir/file)
+    df.drop('rms0', axis=1, inplace=True)
+
+    return df
+
+def get_bsk24_varians_ext_mass_table():
+    file = 'bsk24_varians_ext_sample_mass_table.parquet'
+    df = pd.read_parquet(input_data_dir/file)
+
+    return df
+
+def read_csv(file):
+    df = pd.read_csv(input_data_dir/file, sep=';')
+
+    return df
+
+def read_parquet(file):
+    df = pd.read_parquet(input_data_dir/file)
+
+    return df

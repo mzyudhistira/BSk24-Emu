@@ -87,7 +87,7 @@ def extract_varian_data(df):
 
   return Z, N, mass, params
 
-def select_varian(varian_number):
+def select_varian(varian_number, data='exp'):
     """
     Select varian(s) from the whole BSk24 variations, the input should be a single integer or a list of integers
     """
@@ -98,8 +98,14 @@ def select_varian(varian_number):
     # Select the varians
     varian_list = pd.DataFrame({'varian_id': varian_number})
 
-    varian_param = pd.merge(BSk24_VARIANS, varian_list, on='varian_id', how='inner')
-    varian_mass_table = pd.merge(BSk24_VARIANS_MASS_TABLE, varian_list, on='varian_id', how='inner')
+    if data == 'exp':
+      varian_param = pd.merge(BSk24_VARIANS, varian_list, on='varian_id', how='inner')
+      varian_mass_table = pd.merge(BSk24_VARIANS_MASS_TABLE, varian_list, on='varian_id', how='inner')
+      print(f'in exp, var num = {varian_number}')
+
+    elif data == 'ext':
+      varian_param = pd.merge(BSk24_VARIANS_EXT, varian_list, on='varian_id', how='inner')
+      varian_mass_table = pd.merge(BSk24_VARIANS_EXT_MASS_TABLE, varian_list, on='varian_id', how='inner')
     
     # Merge the parameter and mass table
     selected_varian = pd.merge(varian_mass_table, varian_param, on='varian_id')

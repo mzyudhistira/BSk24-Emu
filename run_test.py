@@ -2,6 +2,7 @@
 Importing required libraries
 """
 #External Library
+import gc
 import numpy as np
 import pandas as pd
 from keras import models, layers, callbacks
@@ -32,7 +33,7 @@ def run(run_param):
     # Sampling the varian
     # varian_number = [1,2,4,5,7,8,9,10] # Pick any number between 1 and 10
     number_of_sample = run_param
-    varian_number = random_integers = random.sample(range(1, 32000), number_of_sample)
+    varian_number = random_integers = random.sample(range(1, 32120), number_of_sample)
     selected_varian = select_varian(varian_number)
     print(selected_varian.shape)
     # selected_varian_sample = selected_varian.sample(frac=0.2).reset_index(drop=True)
@@ -78,7 +79,8 @@ def run(run_param):
     Start training model
     '''
     # Training the model
-    training_label = f'Test {number_of_sample} varians w 0.2% sample each on exp mass predict other {number_of_sample} random samples'
+    varian_train_to_predict_ratio = 8
+    training_label = f'Test {number_of_sample} varians w 0.2% sample each on exp mass predict {varian_train_to_predict_ratio*number_of_sample} random ext samples'
 
     with tf.device('/GPU:0'):
         history_1, history_2, history_3, best_weights = fine_grain_training(model, data_train, data_val, batch_number=[32, 16, 4],
@@ -88,19 +90,20 @@ def run(run_param):
     Generating mass tables
     """
     # Re-initialize model
+    gc.collect()
     model = wouter_model(N_input, 'adadelta')
     model.load_weights(best_weights)
 
     number_of_sample = run_param
-    varian_number = random_integers = random.sample(range(1, 32000), number_of_sample)
-    selected_varian = select_varian(varian_number)
+    varian_number = random_integers = random.sample(range(1, 1000), number_of_sample * varian_train_to_predict_ratio)
+    selected_varian = select_varian(varian_number, data='ext')
     Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = extract_varian_data(selected_varian)
 
     test_input, N_test_input = modified_wouter(Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian)
     generate_mass_table(model, test_input, training_label)
 
 def main():
-    test_param = [4, 32, 64, 128]
+    test_param = [128]
     args = parse_args()
 
     # Run the 'run' program
