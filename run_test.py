@@ -84,7 +84,7 @@ def run(run_param):
 
     with tf.device('/GPU:0'):
         history_1, history_2, history_3, best_weights = fine_grain_training(model, data_train, data_val, batch_number=[32, 16, 4],
-                                                                        epoch_number=[250, 100, 50], training_name=training_label)
+                                                                        epoch_number=[1000, 500, 50], training_name=training_label)
 
     """
     Generating mass tables
@@ -95,7 +95,7 @@ def run(run_param):
     model.load_weights(best_weights)
 
     number_of_sample = run_param
-    varian_number = random_integers = random.sample(range(1, 1000), number_of_sample * varian_train_to_predict_ratio)
+    varian_number = random_integers = random.sample(range(1, 2500), number_of_sample * varian_train_to_predict_ratio)
     selected_varian = select_varian(varian_number, data='ext')
     Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = extract_varian_data(selected_varian)
 
@@ -103,7 +103,7 @@ def run(run_param):
     generate_mass_table(model, test_input, training_label)
 
 def main():
-    test_param = [128]
+    test_param = [2,4,8,16,32,64]
     args = parse_args()
 
     # Run the 'run' program
