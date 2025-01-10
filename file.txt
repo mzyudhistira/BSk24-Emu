@@ -1,0 +1,79 @@
+Test 32 varians w 0.2% sample each on exp mass predict 512 random ext samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 256 random ext samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 128 random ext samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 64 random ext samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict 32 random ext samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict 512 random ext samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict 256 random ext samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 128 random ext samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 64 random ext samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 32 random ext samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict 16 random ext samples.dat
+Test 128 varians w 0.2% sample each on exp mass predict 128 random ext samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict 64 random ext samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict 32 random ext samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 16 random ext samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 8 random ext samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 4 random ext samples.dat
+Test 128 varians w 0.2% sample each on exp mass predict 256 random ext samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict 128 random ext samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict 64 random ext samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 32 random ext samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 16 random ext samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 8 random ext samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict 4 random ext samples.dat
+Test 128 varians w 0.2% sample each on exp mass predict 512 random ext samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict 256 random ext samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict 128 random ext samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 64 random ext samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 32 random ext samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 16 random ext samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict 8 random ext samples.dat
+Test 128 varians w 0.2% sample each on exp mass predict 512 random samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict 256 random samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict 128 random samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 64 random samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 32 random samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 16 random samples.dat
+Test 128 varians w 0.2% sample each on exp mass predict 384 random samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict 192 random samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict 96 random samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict 48 random samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict 24 random samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict 12 random samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict 6 random samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict 2 random ext samples.dat
+Test 128 varians w 0.2% sample each on exp mass predict other 128 random samples.dat
+Test 64 varians w 0.2% sample each on exp mass predict other 64 random samples.dat
+Test 32 varians w 0.2% sample each on exp mass predict other 32 random samples.dat
+Test 4 varians w 0.2% sample each on exp mass predict other 4 random samples.dat
+Test 16 varians w 0.2% sample each on exp mass predict other 16 random samples.dat
+Test 8 varians w 0.2% sample each on exp mass predict other 8 random samples.dat
+Test 2 varians w 0.2% sample each on exp mass predict other 2 random samples.dat
+Test 128 varians w 0.2% sample each on exp mass.dat
+Test 64 varians w 0.2% sample each on exp mass.dat
+Test 32 varians w 0.2% sample each on exp mass.dat
+Test 16 varians w 0.2% sample each on exp mass.dat
+Test 8 varians w 0.2% sample each on exp mass.dat
+Test 2 varians w 0.2% sample each on exp mass.dat
+Test 16 varians w 0.2% sample on exp mass.dat
+Test 8 varians w 0.2% sample on exp mass.dat
+Test 2 varians w 0.2% sample on exp mass.dat
+Test 4 varians w 0.2% Data each on exp mass.dat
+test_dummy_data_96000row.dat
+test_dummy_data_48000row.dat
+test_dummy_data_32000row.dat
+test_dummy_data_16000row.dat
+test_full_bsk24w80%exp_data_oneVarian.dat
+test_full_bsk24w50%exp_data_oneVarian.dat
+test_full_bsk24w20%exp_data_oneVarian.dat
+test_var7_unscaledInput_80%.dat
+test_var7_unscaledInput_70%.dat
+test_var7_unscaledInput_60%.dat
+test_var7_unscaledInput_50%.dat
+test_var7_unscaledInput_40%.dat
+test_var7_unscaledInput_30%.dat
+test_var7_unscaledInput.dat
+test_var2_unscaledInput.dat
+test_var5_unscaledInput.dat
+sample_test=[150,25,25].dat

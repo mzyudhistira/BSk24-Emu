@@ -27,13 +27,22 @@ def melt_mass_table(df, func = get_me_diff_over_std):
     Returns:
         _type_: Mass table with grouped varians
     """
-    return df.groupby(['Z', 'N']).agg({'Difference':func}).rename(columns={'Difference':'me_diff_over_std'}).reset_index()
+    df = df.groupby(['Z', 'N']).agg({'Difference':func})
+    
+    # 
+    data = df['Difference']
+    data_clipped = np.clip(data, -3, 3)
+    df['Difference'] = np.array([np.floor(x) if x < 0 else np.ceil(x) for x in data_clipped])
+
+    df = df.rename(columns={'Difference':'me_diff_over_std'}).reset_index()
+
+    return df
 
 def plot_landscape(df, ax = None):
     if ax is None:
         fig, ax = plt.subplots()
 
-    v_min, v_max = -4, 4
+    v_min, v_max = -3, 3
 
     norm = Normalize(vmin=v_min, vmax=v_max)
     scatter = ax.scatter(df['N'], df['Z'], c=np.clip(df['me_diff_over_std'], v_min, v_max), cmap='plasma', s=5)
@@ -74,34 +83,6 @@ def plot_loss(mass_table_file):
 
     return fig
 
-def animate(i, dfs, scatter, ax):
-    # Remove the old scatter plot
-    for artist in ax.artists:
-        artist.remove()
-    for line in ax.lines:
-        line.remove()
-
-    # Plot the current DataFrame using plot_landscape
-    scatter, ax = plot_landscape(dfs[i], ax)
-
-    ax.set_title(f'Frame {i + 1}')  # Optional: title to show current frame index
-    return scatter,  # Return the scatter for FuncAnimation
-
-def create_animation(dfs):
-    # Create the initial plot
-    fig, ax = plt.subplots()
-    scatter, ax = plot_landscape(dfs[0], ax)
-
-    # Create the animation
-    ani = animation.FuncAnimation(
-        fig, animate, frames=len(dfs), fargs=(dfs, scatter, ax), interval=1000, blit=False
-    )
-
-    # Display the animation
-    plt.show()
-
-    return ani
-
 def analyse(mass_table_file):
     mass_table = pd.read_csv(DATA_DIR / 'output' / mass_table_file, sep=';')
     melted_mass_table = melt_mass_table(mass_table)
@@ -109,14 +90,14 @@ def analyse(mass_table_file):
     rms_deviation = np.sqrt((mass_table['Difference']**2).mean())
     std_difference = mass_table['Difference'].std()
 
-    landscape_plot, _, _ = plot_landscape(melted_mass_table)
+    # landscape_plot, _, _ = plot_landscape(melted_mass_table)
     loss_plot = plot_loss(mass_table_file)
-    plt.close(landscape_plot)
+    # plt.close(landscape_plot)
     plt.close(loss_plot)
  
     return {'mass_table' : mass_table, 'melted_mass_table' : melted_mass_table,
             'rms_dev' : rms_deviation, 'std_diff' : std_difference,
-            'landscape_plot' : landscape_plot, 'loss_plot' : loss_plot}
+            'landscape_plot' : 1, 'loss_plot' : loss_plot}
 
 def main():
     return
