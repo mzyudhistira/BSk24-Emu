@@ -32,7 +32,7 @@ def melt_mass_table(df, func = get_me_diff_over_std):
     # 
     data = df['Difference']
     data_clipped = np.clip(data, -3, 3)
-    df['Difference'] = np.array([np.floor(x) if x < 0 else np.ceil(x) for x in data_clipped])
+    df['Difference'] = np.abs(np.array([np.floor(x) if x < 0 else np.ceil(x) for x in data_clipped]))
 
     df = df.rename(columns={'Difference':'me_diff_over_std'}).reset_index()
 
