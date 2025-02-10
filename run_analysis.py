@@ -3,67 +3,26 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from matplotlib.colors import Normalize
 
-import input
-import model
-import output
-import training
-import output
 import utils
 from config import *
 
-def get_me_diff_over_std(series):
-    return series.mean() / series.std()
-
-def melt_mass_table(df, func = get_me_diff_over_std):    
-    """Melt a mass table by grouping varians of the same isotope together
-
-    Args:
-        df (_type_): Dataframe of the mass table
-        func (_type_, optional): Function used to melt. Defaults to get_me_diff_over_std.
-
-    Returns:
-        _type_: Mass table with grouped varians
-    """
-    df = df.groupby(['Z', 'N']).agg({'Difference':func})
-    
-    # 
-    data = df['Difference']
-    data_clipped = np.clip(data, -3, 3)
-    df['Difference'] = np.abs(np.array([np.floor(x) if x < 0 else np.ceil(x) for x in data_clipped]))
-
-    df = df.rename(columns={'Difference':'me_diff_over_std'}).reset_index()
-
-    return df
-
-def plot_landscape(df, ax = None):
-    if ax is None:
-        fig, ax = plt.subplots()
-
-    v_min, v_max = -3, 3
-
-    norm = Normalize(vmin=v_min, vmax=v_max)
-    scatter = ax.scatter(df['N'], df['Z'], c=np.clip(df['me_diff_over_std'], v_min, v_max), cmap='plasma', s=5)
-
-    # fig.colorbar(scatter, ax=ax, label='Mass Excess Difference (MeV)/std')
-    ax.set_xlabel('N')
-    ax.set_ylabel('Z')
-
-    cbar = plt.colorbar(scatter, ax=ax)
-    cbar.set_label('Mass Excess Difference (MeV)/std')  # Label for the colorbar
-    cbar.set_ticks(np.arange(v_min, v_max + 1, 1))
-
-    return fig, ax, scatter
 
 def plot_loss(mass_table_file):
     result_name = mass_table_file[:-4]
-    batches = [32,16,4]
-    epochs = [250,100,50]
-    loss_dir = TRAINING_DATA_DIR / 'loss'
-    loss_file = [loss_dir/f'{result_name}.batch={batches[i]}.epoch={epochs[i]}.stage{i+1}.loss.dat' for i in range(3)]
-    val_loss_file = [loss_dir/f'{result_name}.batch={batches[i]}.epoch={epochs[i]}.stage{i+1}.val_loss.dat' for i in range(3)]
+    batches = [32, 16, 4]
+    epochs = [250, 100, 50]
+    loss_dir = TRAINING_DATA_DIR / "loss"
+    loss_file = [
+        loss_dir
+        / f"{result_name}.batch={batches[i]}.epoch={epochs[i]}.stage{i+1}.loss.dat"
+        for i in range(3)
+    ]
+    val_loss_file = [
+        loss_dir
+        / f"{result_name}.batch={batches[i]}.epoch={epochs[i]}.stage{i+1}.val_loss.dat"
+        for i in range(3)
+    ]
 
     loss_data = [np.loadtxt(file) for file in loss_file]
     val_loss_data = [np.loadtxt(file) for file in val_loss_file]
@@ -73,31 +32,119 @@ def plot_loss(mass_table_file):
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-    axes[0].plot(np.log(loss_arr), label='loss', color='blue')
-    axes[0].set_xlabel('Epoch')
-    axes[0].set_ylabel('log_10(Loss)')
+    axes[0].plot(np.log(loss_arr), label="loss", color="blue")
+    axes[0].set_xlabel("Epoch")
+    axes[0].set_ylabel("log_10(Loss)")
 
-    axes[1].plot(np.log(val_loss_arr), label='val_loss', color='green')
-    axes[1].set_xlabel('Epoch')
-    axes[1].set_ylabel('log_10(Val_Loss)')
+    axes[1].plot(np.log(val_loss_arr), label="val_loss", color="green")
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylabel("log_10(Val_Loss)")
 
     return fig
 
-def analyse(mass_table_file):
-    mass_table = pd.read_csv(DATA_DIR / 'output' / mass_table_file, sep=';')
-    melted_mass_table = melt_mass_table(mass_table)
-    
-    rms_deviation = np.sqrt((mass_table['Difference']**2).mean())
-    std_difference = mass_table['Difference'].std()
 
-    # landscape_plot, _, _ = plot_landscape(melted_mass_table)
-    loss_plot = plot_loss(mass_table_file)
-    # plt.close(landscape_plot)
-    plt.close(loss_plot)
- 
-    return {'mass_table' : mass_table, 'melted_mass_table' : melted_mass_table,
-            'rms_dev' : rms_deviation, 'std_diff' : std_difference,
-            'landscape_plot' : 1, 'loss_plot' : loss_plot}
+def plot_uncertainty(mass_table, ax=None, bin_edges=[0, 1, 2, 3]):
+    if ax is None:
+        fig, ax = plt.subplots()
 
-def main():
+    # # Use pd.cut() to bin the 'Prediction' values into categories
+    # mass_table["m_std"] = pd.cut(mass_table["m_std"], bins=bin_edges, right=False)
+
+    # # Map categories to the desired values
+    # category_map = {
+    #     pd.Interval(bin_edges[0], bin_edges[1], closed="left"): bin_edges[0],
+    #     pd.Interval(bin_edges[1], bin_edges[2], closed="left"): bin_edges[1],
+    #     pd.Interval(bin_edges[2], bin_edges[3], closed="left"): bin_edges[2],
+    # }
+    # mass_table["m_std"] = mass_table["m_std"].map(category_map)
+    mass_table["m_std"] = np.floor(mass_table["m_std"]).clip(0, 3)
+    colour = {0: "#FCD93D", 1: "#01A5EA", 2: "#008110", 3: "#FF0703"}
+    label = {
+        0: r"$\sigma \leq 1$ MeV",
+        1: r"$1 < \sigma \leq 2$ MeV",
+        2: r"$2 < \sigma \leq 3$ MeV",
+        3: r"$\sigma > 3$ MeV",
+    }
+    plotted_values = [mass_table[mass_table["m_std"] == i] for i in bin_edges]
+
+    for i in range(4):
+        scatter = ax.scatter(
+            plotted_values[i]["N"],
+            plotted_values[i]["Z"],
+            color=colour[i],
+            label=label[i],
+            s=5,
+        )
+
+    utils.plot.set_legend(ax)
+    utils.plot.set_legend(ax)
+
+    return fig, ax
+
+
+def plot_deviation(all_mass_table, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    mass_table = all_mass_table.groupby(["Z", "N"]).agg(
+        {"Difference": "mean", "BSk24": "std"}
+    )
+    mass_table.columns = ["mean_diff", "std_bsk24"]
+    mass_table = mass_table.reset_index()
+
+    mass_table["Deviation"] = mass_table["mean_diff"] / mass_table["std_bsk24"]
+
+    mass_table["Deviation"] = np.floor(mass_table["Deviation"]).clip(0, 3)
+
+    colour = {0: "#FCD93D", 1: "#01A5EA", 2: "#008110", 3: "#FF0703"}
+    label = {
+        0: r"$\sigma$",
+        1: r"$2 * \sigma$",
+        2: r"$3 * \sigma$",
+        3: r"$> 3 * \sigma$",
+    }
+    plotted_values = [mass_table[mass_table["Deviation"] == i] for i in range(4)]
+
+    for i in range(4):
+        scatter = ax.scatter(
+            plotted_values[i]["N"],
+            plotted_values[i]["Z"],
+            color=colour[i],
+            label=label[i],
+            s=5,
+        )
+
+    utils.plot.set_legend(ax)
+    utils.plot.set_tick(ax)
+
+    return fig, ax
+
+
+def main(file):
+    # Get file
+    mass_table_file = ""
+    loss_file = ""
+    val_loss_file = ""
+
+    # Extract the Dataframe
+    all_mass_table = pd.read_csv(file, sep=";")
+    mass_table = all_mass_table.groupby(["Z", "N"]).agg({"Prediction": ["mean", "std"]})
+    mass_table.columns = ["m_mean", "m_std"]
+    mass_table = mass_table.reset_index()
+
+    # Extract data
+    rms_deviation = np.sqrt((all_mass_table["Difference"] ** 2).mean())
+    std_difference = all_mass_table["Difference"].std()
+
+    print(rms_deviation, std_difference)
+
+    # Plot
+    f_unc, ax_unc = plot_uncertainty(mass_table)
+    f_dev, ax_dev = plot_deviation(all_mass_table)
+    # f_loss, ax_loss = plot_loss(file)
+
     return
+
+
+if __name__ == "__main__":
+    main()
