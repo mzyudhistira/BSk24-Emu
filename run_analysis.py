@@ -47,16 +47,6 @@ def plot_uncertainty(mass_table, ax=None, bin_edges=[0, 1, 2, 3]):
     if ax is None:
         fig, ax = plt.subplots()
 
-    # # Use pd.cut() to bin the 'Prediction' values into categories
-    # mass_table["m_std"] = pd.cut(mass_table["m_std"], bins=bin_edges, right=False)
-
-    # # Map categories to the desired values
-    # category_map = {
-    #     pd.Interval(bin_edges[0], bin_edges[1], closed="left"): bin_edges[0],
-    #     pd.Interval(bin_edges[1], bin_edges[2], closed="left"): bin_edges[1],
-    #     pd.Interval(bin_edges[2], bin_edges[3], closed="left"): bin_edges[2],
-    # }
-    # mass_table["m_std"] = mass_table["m_std"].map(category_map)
     mass_table["m_std"] = np.floor(mass_table["m_std"]).clip(0, 3)
     colour = {0: "#FCD93D", 1: "#01A5EA", 2: "#008110", 3: "#FF0703"}
     label = {
@@ -98,10 +88,10 @@ def plot_deviation(all_mass_table, ax=None):
 
     colour = {0: "#FCD93D", 1: "#01A5EA", 2: "#008110", 3: "#FF0703"}
     label = {
-        0: r"$\sigma$",
-        1: r"$2 * \sigma$",
-        2: r"$3 * \sigma$",
-        3: r"$> 3 * \sigma$",
+        0: r"$\epsilon = \sigma_\text{BSk24v}$",
+        1: r"$\epsilon = 2 \sigma_\text{BSk24v}$",
+        2: r"$\epsilon = 3 \sigma_\text{BSk24v}$",
+        3: r"$\epsilon > 3 \sigma_\text{BSk24v}$",
     }
     plotted_values = [mass_table[mass_table["Deviation"] == i] for i in range(4)]
 
@@ -131,6 +121,7 @@ def main(file):
     mass_table = all_mass_table.groupby(["Z", "N"]).agg({"Prediction": ["mean", "std"]})
     mass_table.columns = ["m_mean", "m_std"]
     mass_table = mass_table.reset_index()
+    print(mass_table)
 
     # Extract data
     rms_deviation = np.sqrt((all_mass_table["Difference"] ** 2).mean())
@@ -143,6 +134,10 @@ def main(file):
     f_dev, ax_dev = plot_deviation(all_mass_table)
     # f_loss, ax_loss = plot_loss(file)
 
+    return
+
+
+def write_result():
     return
 
 
