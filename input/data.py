@@ -48,6 +48,14 @@ def load_df(name):
 
 
 def load_data(name):
+    """Lazy BSk24s data loading
+
+    Args:
+        name (str): Dataset's label
+
+    Returns:
+        param, mass_table (pandas dataframe): The parameter and mass table of the selected model
+    """
     if name == "default" or name == "exp":
         param = load_df(BSk24_dataset["BSk24_param"])
         mass_table = load_df(BSk24_dataset["BSk24_mass_table_" + name])

@@ -206,7 +206,7 @@ def fine_grain_training(
         weights_file=lastfname,
     )
 
-    model = wouter_model(len(train_dat[0][:-1]), "adagrad")
+    # model = wouter_model(len(train_dat[0][:-1]), "adagrad")
 
     history[2], lastfname, bestfname, performance_logs[2] = model_training(
         training_names[2],

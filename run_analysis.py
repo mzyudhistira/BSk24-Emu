@@ -121,7 +121,6 @@ def main(file):
     mass_table = all_mass_table.groupby(["Z", "N"]).agg({"Prediction": ["mean", "std"]})
     mass_table.columns = ["m_mean", "m_std"]
     mass_table = mass_table.reset_index()
-    print(mass_table)
 
     # Extract data
     rms_deviation = np.sqrt((all_mass_table["Difference"] ** 2).mean())
@@ -134,7 +133,7 @@ def main(file):
     f_dev, ax_dev = plot_deviation(all_mass_table)
     # f_loss, ax_loss = plot_loss(file)
 
-    return
+    return mass_table
 
 
 def write_result():
