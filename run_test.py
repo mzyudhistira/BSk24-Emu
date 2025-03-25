@@ -28,18 +28,13 @@ def run(run_param):
 
     # Generate input data
     bsk24_param = BSk24
-    bsk24_mass_table = BSk24_EXPERIMENTAL_MASS_TABLE
+    bsk24_mass_table = BSk24_MASS_TABLE
     bsk24_varians_param = BSk24_VARIANS_EXT
     bsk24_varians_mass_table = BSk24_VARIANS_EXT_MASS_TABLE
 
     # Sampling the varian
-    # varian_number = [1,2,4,5,7,8,9,10] # Pick any number between 1 and 10
-    number_of_sample = run_param
-    varian_number = random_integers = random.sample(range(1, 32120), number_of_sample)
-    selected_varian = select_varian(varian_number, data="ext")
-    print(selected_varian.shape)
-    # selected_varian_sample = selected_varian.sample(frac=0.2).reset_index(drop=True)
-    # -------------------------------------------------------------------------------
+    varian_sample = run_param[:24]
+    selected_varian = select_varian(varian_sample, data="ext")
     selected_varian_sample = (
         selected_varian.groupby("varian_id", group_keys=False)
         .apply(lambda x: x.sample(frac=0.2))
@@ -63,19 +58,11 @@ def run(run_param):
     params = np.concatenate((param_bsk24, params_bsk24_varian))
 
     input_data, N_input = modified_wouter(Z, N, m, params)
-    # input_data, N_input = generate_wouters_input_data(Z_bsk24, N_bsk24, m_bsk24)
 
     # Modify input data
     np.random.shuffle(input_data)
-    # N_train, N_val, N_test = [150,25,25]
-    # data_train, data_test, data_val = select_input(input_data,N_train,N_val,N_test)
     data_train, data_test, data_val = split_input(input_data, 0.8, 0.1, 0.1)
     # normalize_input(data_train, data_test, data_val, input_data, N_input)
-
-    # Reorder the data
-    # data_train = reorder_data(data_train[:,0], data_train[:,1], data_train)
-    # data_test = reorder_data(data_test[:,0], data_test[:,1], data_test)
-    # data_val = reorder_data(data_val[:,0], data_val[:,1], data_val)
 
     # Initialize the model
     model = wouter_model(N_input, "rmsprop")
@@ -85,8 +72,7 @@ def run(run_param):
     Start training model
     """
     # Training the model
-    varian_train_to_predict_ratio = 4
-    training_label = f"Test {number_of_sample} varians w 0.2% sample each on exp mass predict {varian_train_to_predict_ratio*number_of_sample} random ext samples, full mass table"
+    training_label = f"EXT 24 run, code: {run_param[0]}"
 
     with tf.device("/GPU:0"):
         history_1, history_2, history_3, best_weights = fine_grain_training(
@@ -94,7 +80,7 @@ def run(run_param):
             data_train,
             data_val,
             batch_number=[32, 16, 4],
-            epoch_number=[1000, 500, 50],
+            epoch_number=[500, 100, 50],
             training_name=training_label,
         )
 
@@ -102,27 +88,50 @@ def run(run_param):
     Generating mass tables
     """
     # Re-initialize model
-    gc.collect()
     model = wouter_model(N_input, "adadelta")
     model.load_weights(best_weights)
 
-    number_of_sample = run_param
-    varian_number = random_integers = random.sample(
-        range(1, 2500), number_of_sample * varian_train_to_predict_ratio
-    )
-    selected_varian = select_varian(varian_number, data="ext")
+    varian_test = run_param[24:]
+    selected_varian = select_varian(varian_test, data="ext")
     Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = (
         extract_varian_data(selected_varian)
     )
-
     test_input, N_test_input = modified_wouter(
         Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian
     )
+
     generate_mass_table(model, test_input, training_label)
 
 
 def main():
-    test_param = [64]
+    varian_ids = list(range(1, 11023))
+    random.shuffle(varian_ids)
+    sample_number = [24, 24, 24]
+    varian_train_to_predict_ratio = 4
+    test_number = [varian_train_to_predict_ratio * i for i in sample_number]
+
+    test_param = []
+    test_param.append(
+        varian_ids[: sample_number[0] * (varian_train_to_predict_ratio + 1)]
+    )
+    test_param.append(
+        varian_ids[
+            sample_number[0]
+            * (varian_train_to_predict_ratio + 1) : 2
+            * sample_number[1]
+            * (varian_train_to_predict_ratio + 1)
+        ]
+    )
+    test_param.append(
+        varian_ids[
+            2
+            * sample_number[1]
+            * (varian_train_to_predict_ratio + 1) : 3
+            * sample_number[2]
+            * (varian_train_to_predict_ratio + 1)
+        ]
+    )
+
     args = parse_args()
 
     # Run the 'run' program

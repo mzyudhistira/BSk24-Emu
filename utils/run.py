@@ -2,8 +2,9 @@ import argparse
 import json
 import multiprocessing
 import os
-import numpy as np
 from typing import List, Dict
+
+import numpy as np
 
 def load_param(param_json):
     """

@@ -47,17 +47,8 @@ def plot_uncertainty(mass_table, ax=None, bin_edges=[0, 1, 2, 3]):
     if ax is None:
         fig, ax = plt.subplots()
 
-    # # Use pd.cut() to bin the 'Prediction' values into categories
-    # mass_table["m_std"] = pd.cut(mass_table["m_std"], bins=bin_edges, right=False)
-
-    # # Map categories to the desired values
-    # category_map = {
-    #     pd.Interval(bin_edges[0], bin_edges[1], closed="left"): bin_edges[0],
-    #     pd.Interval(bin_edges[1], bin_edges[2], closed="left"): bin_edges[1],
-    #     pd.Interval(bin_edges[2], bin_edges[3], closed="left"): bin_edges[2],
-    # }
-    # mass_table["m_std"] = mass_table["m_std"].map(category_map)
-    mass_table["m_std"] = np.floor(mass_table["m_std"]).clip(0, 3)
+    mass_table_unc = mass_table.copy()
+    mass_table_unc["m_std"] = np.floor(mass_table["m_std"]).clip(0, 3)
     colour = {0: "#FCD93D", 1: "#01A5EA", 2: "#008110", 3: "#FF0703"}
     label = {
         0: r"$\sigma \leq 1$ MeV",
@@ -65,7 +56,7 @@ def plot_uncertainty(mass_table, ax=None, bin_edges=[0, 1, 2, 3]):
         2: r"$2 < \sigma \leq 3$ MeV",
         3: r"$\sigma > 3$ MeV",
     }
-    plotted_values = [mass_table[mass_table["m_std"] == i] for i in bin_edges]
+    plotted_values = [mass_table_unc[mass_table_unc["m_std"] == i] for i in bin_edges]
 
     for i in range(4):
         scatter = ax.scatter(
@@ -77,33 +68,76 @@ def plot_uncertainty(mass_table, ax=None, bin_edges=[0, 1, 2, 3]):
         )
 
     utils.plot.set_legend(ax)
-    utils.plot.set_legend(ax)
+    utils.plot.set_tick(ax)
 
     return fig, ax
+
+
+def plot_uncertainty_all(mass_table, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    scatter = ax.scatter(
+        mass_table["N"], mass_table["Z"], c=mass_table["m_std"], s=4, cmap="inferno"
+    )
+    fig.colorbar(scatter, ax=ax)
+
+    utils.plot.set_tick(ax)
+
+    return fig, ax
+
+
+def plot_histogram_nucleus(N, Z, mass_table, resolution=0.01, ax=None):
+    """Plot the mass distribution of a given nucleus
+
+    Args:
+        N (int): Neutron number
+        Z (int): Proton number
+        mass_table (dataframe): Mass table from the output
+        resolution (float, optional): Smallest scale of the dataset. Defaults to 0.01 MeV.
+        ax (plt.ax, optional): Pre-defined axis, used if wants to put the plot on top of another. Defaults to None.
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    nucleus_mass = mass_table[(mass_table["N"] == N) & (mass_table["Z"] == Z)]
+    mass_range = nucleus_mass["Prediction"].max() - nucleus_mass["Prediction"].min()
+    bins = int(np.ceil(mass_range / resolution))
+
+    ax.hist(nucleus_mass["Prediction"], bins=bins)
+    ax.set_title(f"Mass Distribution of Nucleus N={N}, Z={Z}")
+    ax.set_xlabel("Mass (MeV)")
+    ax.set_ylabel("Frequency")
+
+    fig.show()
 
 
 def plot_deviation(all_mass_table, ax=None):
     if ax is None:
         fig, ax = plt.subplots()
 
-    mass_table = all_mass_table.groupby(["Z", "N"]).agg(
+    mass_table_dev = all_mass_table.groupby(["Z", "N"]).agg(
         {"Difference": "mean", "BSk24": "std"}
     )
-    mass_table.columns = ["mean_diff", "std_bsk24"]
-    mass_table = mass_table.reset_index()
+    mass_table_dev.columns = ["mean_diff", "std_bsk24"]
+    mass_table_dev = mass_table_dev.reset_index()
 
-    mass_table["Deviation"] = mass_table["mean_diff"] / mass_table["std_bsk24"]
+    mass_table_dev["Deviation"] = (
+        mass_table_dev["mean_diff"] / mass_table_dev["std_bsk24"]
+    )
 
-    mass_table["Deviation"] = np.floor(mass_table["Deviation"]).clip(0, 3)
+    mass_table_dev["Deviation"] = np.floor(mass_table_dev["Deviation"]).clip(0, 3)
 
     colour = {0: "#FCD93D", 1: "#01A5EA", 2: "#008110", 3: "#FF0703"}
     label = {
-        0: r"$\sigma$",
-        1: r"$2 * \sigma$",
-        2: r"$3 * \sigma$",
-        3: r"$> 3 * \sigma$",
+        0: r"$\epsilon = \sigma$",
+        1: r"$\epsilon = 2 * \sigma$",
+        2: r"$\epsilon = 3 * \sigma$",
+        3: r"$\epsilon > 3 * \sigma$",
     }
-    plotted_values = [mass_table[mass_table["Deviation"] == i] for i in range(4)]
+    plotted_values = [
+        mass_table_dev[mass_table_dev["Deviation"] == i] for i in range(4)
+    ]
 
     for i in range(4):
         scatter = ax.scatter(
@@ -136,14 +170,14 @@ def main(file):
     rms_deviation = np.sqrt((all_mass_table["Difference"] ** 2).mean())
     std_difference = all_mass_table["Difference"].std()
 
-    print(rms_deviation, std_difference)
+    print(f"rms_deviation: {rms_deviation}")
+    print(f"std_difference: {std_difference}")
 
     # Plot
     f_unc, ax_unc = plot_uncertainty(mass_table)
+    f_unca, ax_unca = plot_uncertainty_all(mass_table)
     f_dev, ax_dev = plot_deviation(all_mass_table)
     # f_loss, ax_loss = plot_loss(file)
-
-    return
 
 
 if __name__ == "__main__":
