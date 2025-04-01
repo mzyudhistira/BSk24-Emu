@@ -80,7 +80,12 @@ def plot_uncertainty_all(mass_table, ax=None):
     scatter = ax.scatter(
         mass_table["N"], mass_table["Z"], c=mass_table["m_std"], s=4, cmap="inferno"
     )
-    fig.colorbar(scatter, ax=ax)
+    ax.set_title(f"Uncertainty of Mass Prediction Across the Nuclear Chart")
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+
+    colour_bar = fig.colorbar(scatter, ax=ax)
+    colour_bar.set_label(r"$\sigma$ (MeV)")
 
     utils.plot.set_tick(ax)
 
@@ -119,6 +124,7 @@ def plot_deviation(all_mass_table, ax=None):
     mass_table_dev = all_mass_table.groupby(["Z", "N"]).agg(
         {"Difference": "mean", "BSk24": "std"}
     )
+    print(mass_table_dev)
     mass_table_dev.columns = ["mean_diff", "std_bsk24"]
     mass_table_dev = mass_table_dev.reset_index()
 
