@@ -124,7 +124,6 @@ def plot_deviation(all_mass_table, ax=None):
     mass_table_dev = all_mass_table.groupby(["Z", "N"]).agg(
         {"Difference": "mean", "BSk24": "std"}
     )
-    print(mass_table_dev)
     mass_table_dev.columns = ["mean_diff", "std_bsk24"]
     mass_table_dev = mass_table_dev.reset_index()
 

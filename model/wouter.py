@@ -45,6 +45,6 @@ def wouter_model(N_input, optimizer):
     # mae = mean average error
     # loss : what will be minimize
     # metrics : what will be shown
-    model.compile(optimizer="adam", loss=custom_loss2, metrics=["mae"])
+    model.compile(optimizer=optimizer, loss="mse", metrics=["mae"])
 
     return model
