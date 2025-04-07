@@ -14,7 +14,6 @@ def generate_mass_table(model, complete_data, name):
     """
     # Testing the model
     y = np.array(model.predict(complete_data[:, :-1])).flatten()
-    print(y)
 
     # Generating data
     Z = np.array(complete_data[:, 1])

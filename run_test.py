@@ -61,6 +61,9 @@ def run(run_param):
     params = np.concatenate((param_bsk24, params_bsk24_varian))
 
     input_data, N_input = modified_wouter(Z, N, m, params)
+    # input_data, N_input = modified_wouter(
+    #     Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian
+    # )
 
     # Modify input data
     np.random.shuffle(input_data)
@@ -83,7 +86,7 @@ def run(run_param):
             data_train,
             data_val,
             batch_number=[32, 16, 4],
-            epoch_number=[10, 5, 1],
+            epoch_number=[100, 50, 10],
             training_name=training_label,
         )
 
@@ -108,6 +111,7 @@ def run(run_param):
     )
 
     generate_mass_table(model, test_input, training_label)
+    print(training_label)
 
 
 def main():

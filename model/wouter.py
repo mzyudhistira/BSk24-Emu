@@ -1,5 +1,6 @@
 from keras import models, layers, Input
 from keras.optimizers import SGD
+from keras.optimizers import Adam
 import tensorflow as tf
 import numpy as np
 
@@ -45,6 +46,6 @@ def wouter_model(N_input, optimizer):
     # mae = mean average error
     # loss : what will be minimize
     # metrics : what will be shown
-    model.compile(optimizer=optimizer, loss="mse", metrics=["mae"])
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss="mse", metrics=["mae"])
 
     return model
