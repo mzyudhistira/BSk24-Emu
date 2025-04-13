@@ -21,6 +21,22 @@ def get_mass_diff(variant_mass_table):
     return variant_mass_table
 
 
+def normalize_params(variant_mass_table):
+    from input.data import BSk24 as BSk24_param
+
+    cname1 = [f"param(0{i})" for i in range(1, 10)]
+    cname2 = [f"param({i})" for i in range(10, 22)]
+    cname = cname1 + cname2
+
+    BSk24_param.columns = cname
+    intersection = variant_mass_table.columns.intersection(BSk24_param.columns)
+    variant_mass_table[intersection] = (
+        variant_mass_table[intersection] - BSk24_param[intersection].values
+    )
+
+    return variant_mass_table
+
+
 def generate_wouters_input_data(
     N, Z, binding_energy, NMN=[8, 20, 28, 50, 82, 126], PNM=[8, 20, 28, 50, 82, 126]
 ):

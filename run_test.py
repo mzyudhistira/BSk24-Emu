@@ -41,7 +41,10 @@ def run(run_param):
         .reset_index(drop=True)
     )
 
-    selected_varian_sample = get_mass_diff(selected_varian_sample)
+    selected_varian_sample = get_mass_diff(
+        selected_varian_sample
+    )  # Set the target to the diff wrt BSk24
+    # selected_varian_sample = normalize_params(selected_varian_sample)
 
     bsk24_mass_table["m_0"] = 0
     Z_bsk24 = bsk24_mass_table["Z"]
@@ -78,7 +81,7 @@ def run(run_param):
     Start training model
     """
     # Training the model
-    training_label = f"EXT on diff, code:{run_param[0]}"
+    training_label = f"EXT Fixed NN, Code: {run_param[0]}"
 
     with tf.device("/GPU:0"):
         history_1, history_2, history_3, best_weights = fine_grain_training(
@@ -95,12 +98,12 @@ def run(run_param):
     """
     # Re-initialize model
     # N_input = 31
-    # best_weights = "data/training/weight_training/EXT 24 run SGD, code: 1878.batch=16.epoch=100.stage2.weights.h5"
-    # training_label = f"Variant_SGD{run_param}"
+    # best_weights = "data/training/weight_best/EXT on diff, code:5415.batch=4.epoch=10.stage3.weights.h5"
+    # training_label = f"Variant_Diff{run_param}"
     model = wouter_model(N_input, "adadelta")
     model.load_weights(best_weights)
 
-    varian_test = run_param[24:]
+    varian_test = run_param
     selected_varian = select_varian(varian_test, data="ext")
     selected_varian = get_mass_diff(selected_varian)
     Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = (
@@ -115,35 +118,35 @@ def run(run_param):
 
 
 def main():
-    varian_ids = list(range(1, 11023))
-    random.shuffle(varian_ids)
-    sample_number = [24, 24, 24]
-    varian_train_to_predict_ratio = 4
-    test_number = [varian_train_to_predict_ratio * i for i in sample_number]
-
-    test_param = []
-    test_param.append(
-        varian_ids[: sample_number[0] * (varian_train_to_predict_ratio + 1)]
-    )
-    test_param.append(
-        varian_ids[
-            sample_number[0]
-            * (varian_train_to_predict_ratio + 1) : 2
-            * sample_number[1]
-            * (varian_train_to_predict_ratio + 1)
-        ]
-    )
-    test_param.append(
-        varian_ids[
-            2
-            * sample_number[1]
-            * (varian_train_to_predict_ratio + 1) : 3
-            * sample_number[2]
-            * (varian_train_to_predict_ratio + 1)
-        ]
-    )
-
-    # test_param = varian_ids[:3]
+    # varian_ids = list(range(1, 11023))
+    # random.shuffle(varian_ids)
+    # sample_number = [24, 24, 24]
+    # varian_train_to_predict_ratio = 4
+    # test_number = [varian_train_to_predict_ratio * i for i in sample_number]
+    #
+    # test_param = []
+    # test_param.append(
+    #     varian_ids[: sample_number[0] * (varian_train_to_predict_ratio + 1)]
+    # )
+    # test_param.append(
+    #     varian_ids[
+    #         sample_number[0]
+    #         * (varian_train_to_predict_ratio + 1) : 2
+    #         * sample_number[1]
+    #         * (varian_train_to_predict_ratio + 1)
+    #     ]
+    # )
+    # test_param.append(
+    #     varian_ids[
+    #         2
+    #         * sample_number[1]
+    #         * (varian_train_to_predict_ratio + 1) : 3
+    #         * sample_number[2]
+    #         * (varian_train_to_predict_ratio + 1)
+    #     ]
+    # )
+    # np.savetxt('test_param.csv', test_param, delimiter=';')
+    test_param = np.loadtxt("test_param.csv", delimiter=";")
 
     args = parse_args()
 
@@ -154,7 +157,7 @@ def main():
             pool.map(run, test_param)
     else:
         print("Running in sequential")
-        for param in test_param[:1]:
+        for param in test_param:
             run(param)
 
 

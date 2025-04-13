@@ -106,7 +106,12 @@ def plot_histogram_nucleus(N, Z, mass_table, resolution=0.01, ax=None):
         fig, ax = plt.subplots()
 
     nucleus_mass = mass_table[(mass_table["N"] == N) & (mass_table["Z"] == Z)]
-    mass_range = nucleus_mass["Prediction"].max() - nucleus_mass["Prediction"].min()
+    # mass_range = nucleus_mass["Prediction"].nanmax() - nucleus_mass["Prediction"].nanmin()
+
+    mass_range = np.nanmax(nucleus_mass["Prediction"].values) - np.nanmin(
+        nucleus_mass["Prediction"].values
+    )
+
     bins = int(np.ceil(mass_range / resolution))
 
     ax.hist(nucleus_mass["Prediction"], bins=bins)
