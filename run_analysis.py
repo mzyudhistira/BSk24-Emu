@@ -114,7 +114,7 @@ def plot_histogram_nucleus(N, Z, mass_table, resolution=0.01, ax=None):
 
     bins = int(np.ceil(mass_range / resolution))
 
-    ax.hist(nucleus_mass["Prediction"], bins=bins)
+    ax.hist(nucleus_mass["Prediction"], bins=bins, label="ML")
     ax.set_title(f"Mass Distribution of Nucleus N={N}, Z={Z}")
     ax.set_xlabel("Mass (MeV)")
     ax.set_ylabel("Frequency")
@@ -182,9 +182,10 @@ def main(file):
 
     print(f"rms_deviation: {rms_deviation}")
     print(f"std_difference: {std_difference}")
+    print(f'avg: {all_mass_table["Difference"].mean()}')
 
     # Plot
-    f_unc, ax_unc = plot_uncertainty(mass_table)
+    # f_unc, ax_unc = plot_uncertainty(mass_table)
     f_unca, ax_unca = plot_uncertainty_all(mass_table)
     f_dev, ax_dev = plot_deviation(all_mass_table)
     # f_loss, ax_loss = plot_loss(file)

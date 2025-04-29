@@ -44,7 +44,7 @@ def run(run_param):
     selected_varian_sample = get_mass_diff(
         selected_varian_sample
     )  # Set the target to the diff wrt BSk24
-    # selected_varian_sample = normalize_params(selected_varian_sample)
+    selected_varian_sample = normalize_params(selected_varian_sample)
 
     bsk24_mass_table["m_0"] = 0
     Z_bsk24 = bsk24_mass_table["Z"]
@@ -81,31 +81,32 @@ def run(run_param):
     Start training model
     """
     # Training the model
-    training_label = f"EXT Fixed NN, Code: {run_param[0]}"
+    training_label = f"EXT Fixed, Code: {run_param[0]}"
 
-    with tf.device("/GPU:0"):
-        history_1, history_2, history_3, best_weights = fine_grain_training(
-            model,
-            data_train,
-            data_val,
-            batch_number=[32, 16, 4],
-            epoch_number=[100, 50, 10],
-            training_name=training_label,
-        )
+    # with tf.device("/GPU:0"):
+    #     history_1, history_2, history_3, best_weights = fine_grain_training(
+    #         model,
+    #         data_train,
+    #         data_val,
+    #         batch_number=[32, 16, 4],
+    #         epoch_number=[100, 50, 10],
+    #         training_name=training_label,
+    #     )
 
     """
     Generating mass tables
     """
     # Re-initialize model
-    # N_input = 31
-    # best_weights = "data/training/weight_best/EXT on diff, code:5415.batch=4.epoch=10.stage3.weights.h5"
+    N_input = 31
+    best_weights = f"data/training/weight_best/{training_label}.batch=4.epoch=10.stage3.weights.h5"
     # training_label = f"Variant_Diff{run_param}"
     model = wouter_model(N_input, "adadelta")
-    model.load_weights(best_weights)
+    # model.load_weights(best_weights)
 
     varian_test = run_param
     selected_varian = select_varian(varian_test, data="ext")
     selected_varian = get_mass_diff(selected_varian)
+    selected_varian = normalize_params(selected_varian)
     Z_bsk24_varian, N_bsk24_varian, m_bsk24_varian, params_bsk24_varian = (
         extract_varian_data(selected_varian)
     )

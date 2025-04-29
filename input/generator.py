@@ -118,16 +118,17 @@ def modified_wouter(
     A modified version of wouter input data. This consists of:
     Z = Proton Number
     N = Neutron number
-    param = a list of parameters that is used, this follows the order
+    param = a list of parameters that are used, this follows the order
     t_0;t_1;t_2;t_3;t_4;t_5;x_0;x_1;x_2;x_3;x_4;x_5;alpha;beta;gamma;W_0;f_n+;f_n-;f_p+;f_p-;epsilon_A
     M = mass (MeV)
     """
 
     wouter_dat, N_input = generate_wouters_input_data(N, Z, M, NMN=NMN, PNM=PNM)
-    N_input = 31
+    # N_input = 23
 
     complete_dat = np.concatenate(
         (wouter_dat[:, :-1], param, wouter_dat[:, -1][:, np.newaxis]), axis=1
     )
+    N_input = wouter_dat[:, :-1].shape[1] + param.shape[1]
 
     return complete_dat, N_input
