@@ -18,7 +18,7 @@ def run(param):
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     # Extract parameters
-    variant_sample, percentage, label = param
+    variant_sample, mult, label = param
 
     # Generate input data
     bsk24_param = BSk24
@@ -32,7 +32,7 @@ def run(param):
 
     selected_variant_sample = (
         bsk24_variants_mass_table.groupby("varian_id", group_keys=False)
-        .apply(lambda x: x.sample(frac=percentage))
+        .apply(lambda x: x.sample(frac=0.4))
         .reset_index(drop=True)
     )
 
@@ -40,7 +40,6 @@ def run(param):
     n = selected_variant_sample["N"].values[:, None]
     m = selected_variant_sample["m"].values[:, None]
     input_data = np.concatenate((n, z, m), axis=1)
-    print(input_data.shape)
     N_input = 2
 
     np.random.shuffle(input_data)
@@ -48,7 +47,7 @@ def run(param):
     # normalize_input(data_train, data_test, data_val, input_data, N_input)
 
     # Initialize the model
-    model = wouter_model(N_input, "rmsprop")
+    model = wouter_model(N_input, "rmsprop", k=mult)
     model.summary()
 
     # Start training
@@ -66,7 +65,7 @@ def run(param):
         )
 
     # Make prediction
-    model = wouter_model(N_input, "adadelta")
+    model = wouter_model(N_input, "adadelta", k=mult)
     model.load_weights(best_weights)
 
     selected_varian = select_varian(variant_sample, data="ext")
@@ -95,30 +94,27 @@ def run(param):
 
 def main():
     variant = 3123
-    added_layers = list(range(1, 11))
-    labels = [
-        f"Variant {variant} with {added_layer} Extra Layers"
-        for added_layer in added_layers
-    ]
+    neurons = list(range(1, 5))
+    labels = [f"Variant {variant} with {x}*neurons" for x in range(1, 5)]
     observed_effect = []
 
-    for i in range(10):
-        test_param = [variant, added_layers[i], labels[i]]
+    for i in range(4):
+        test_param = [variant, neurons[i], labels[i]]
         effect = run(test_param)
-        percentage_effect.append(effect)
+        observed_effect.append(effect)
 
-    percentage_effect = np.array(percentage_effect)
+    observed_effect = np.array(observed_effect)
     df = pd.DataFrame(
         {
-            "Variant": [variant] * 10,
-            "added_layers": added_layers,
+            "Variant": [variant] * 4,
+            "neurons_mult_f": neurons,
             "rms_dev": observed_effect[:, 0],
             "avg_dev": observed_effect[:, 1],
             "last_loss": observed_effect[:, 2],
         }
     )
 
-    df.to_csv("data/output/250505/layer_effect.csv", index=False)
+    df.to_csv("data/output/250505/neurons_effect.csv", index=False)
 
 
 if __name__ == "__main__":

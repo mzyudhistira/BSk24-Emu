@@ -17,7 +17,7 @@ def custom_loss2(y_true, y_pred):
     return mse_loss
 
 
-def wouter_model(N_input, optimizer):
+def wouter_model(N_input, optimizer, k=1):
     """
     Build a model that expects data of dimension N_input , that should be
     optimized with specified algorithm.
@@ -35,11 +35,13 @@ def wouter_model(N_input, optimizer):
     model.add(Input(shape=(N_input,)))
     # first layer connected to the input
     # model.add(layers.Dense(128,activation='relu',input_shape=(N_input,)))
-    model.add(layers.Dense(128, activation="relu"))
+    model.add(layers.Dense(512 * k, activation="relu"))
+    model.add(layers.Dense(256 * k, activation="relu"))
+    model.add(layers.Dense(128 * k, activation="relu"))
     # hidden layer
-    model.add(layers.Dense(64, activation="relu"))
+    model.add(layers.Dense(64 * k, activation="relu"))
     # hidden layer
-    model.add(layers.Dense(32, activation="relu"))
+    model.add(layers.Dense(32 * k, activation="relu"))
     # final layer conected to the output
     model.add(layers.Dense(1))
     # mse = mean squared error
