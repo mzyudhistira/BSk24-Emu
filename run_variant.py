@@ -75,10 +75,7 @@ def run(param):
     m = selected_variant_sample["m"].values[:, None]
 
     test_input = np.concatenate((n, z, m), axis=1)
-<<<<<<< Updated upstream
-=======
     # normalise(test_input)
->>>>>>> Stashed changes
 
     result = generate_mass_table(model, test_input, training_label)
     rms_dev = np.sqrt((result["Difference"] ** 2).mean())
@@ -98,47 +95,30 @@ def run(param):
 
 def main():
     variant = 3123
-<<<<<<< Updated upstream
-    percentages = np.linspace(0.1, 1, 10)
-    labels = [f"Variant {variant} on {percentage}% Data" for percentage in percentages]
-    percentage_effect = []
-
-    for i in range(10):
-        test_param = [variant, percentages[i], labels[i]]
-=======
-    added_layers = list(range(1, 7))
+    added_layers = list(range(1, 11))
     labels = [
         f"Variant {variant} with {added_layer} Extra Layers"
         for added_layer in added_layers
     ]
     observed_effect = []
 
-    for i in range(6):
+    for i in range(10):
         test_param = [variant, added_layers[i], labels[i]]
->>>>>>> Stashed changes
         effect = run(test_param)
         percentage_effect.append(effect)
 
     percentage_effect = np.array(percentage_effect)
     df = pd.DataFrame(
         {
-<<<<<<< Updated upstream
             "Variant": [variant] * 10,
-            "Percentage": percentages,
-            "rms_dev": percentage_effect[:, 0],
-            "avg_dev": percentage_effect[:, 1],
-            "last_loss": percentage_effect[:, 2],
-=======
-            "Variant": [variant] * 6,
             "added_layers": added_layers,
             "rms_dev": observed_effect[:, 0],
             "avg_dev": observed_effect[:, 1],
             "last_loss": observed_effect[:, 2],
->>>>>>> Stashed changes
         }
     )
 
-    df.to_csv("data/output/250505/percentage_effect.csv", index=False)
+    df.to_csv("data/output/250505/layer_effect.csv", index=False)
 
 
 if __name__ == "__main__":
