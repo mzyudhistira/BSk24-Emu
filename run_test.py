@@ -81,27 +81,29 @@ def run(run_param):
     Start training model
     """
     # Training the model
-    training_label = f"EXT Fixed, Code: {run_param[0]}"
+    training_label = f"EXT Fixed xl, Code: {run_param[0]}"
 
-    # with tf.device("/GPU:0"):
-    #     history_1, history_2, history_3, best_weights = fine_grain_training(
-    #         model,
-    #         data_train,
-    #         data_val,
-    #         batch_number=[32, 16, 4],
-    #         epoch_number=[100, 50, 10],
-    #         training_name=training_label,
-    #     )
+    with tf.device("/GPU:0"):
+        history_1, history_2, history_3, best_weights = fine_grain_training(
+            model,
+            data_train,
+            data_val,
+            batch_number=[32, 16, 4],
+            epoch_number=[100, 50, 10],
+            training_name=training_label,
+        )
 
     """
     Generating mass tables
     """
     # Re-initialize model
-    N_input = 31
-    best_weights = f"data/training/weight_best/{training_label}.batch=4.epoch=10.stage3.weights.h5"
+    # N_input = 31
+    # best_weights = (
+    #     f"data/training/weight_best/{training_label}.batch=4.epoch=10.stage3.weights.h5"
+    # )
     # training_label = f"Variant_Diff{run_param}"
     model = wouter_model(N_input, "adadelta")
-    # model.load_weights(best_weights)
+    model.load_weights(best_weights)
 
     varian_test = run_param
     selected_varian = select_varian(varian_test, data="ext")
@@ -115,7 +117,6 @@ def run(run_param):
     )
 
     generate_mass_table(model, test_input, training_label)
-    print(training_label)
 
 
 def main():

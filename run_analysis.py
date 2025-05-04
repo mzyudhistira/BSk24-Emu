@@ -11,7 +11,7 @@ from config import *
 def plot_loss(mass_table_file):
     result_name = mass_table_file[:-4]
     batches = [32, 16, 4]
-    epochs = [250, 100, 50]
+    epochs = [1200, 400, 100]
     loss_dir = TRAINING_DATA_DIR / "loss"
     loss_file = [
         loss_dir
@@ -30,17 +30,33 @@ def plot_loss(mass_table_file):
     loss_arr = [item for sublist in loss_data for item in sublist]
     val_loss_arr = [item for sublist in val_loss_data for item in sublist]
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    fig, axes = plt.subplots(3, 2, figsize=(12, 10))
 
-    axes[0].plot(np.log(loss_arr), label="loss", color="blue")
-    axes[0].set_xlabel("Epoch")
-    axes[0].set_ylabel("log_10(Loss)")
+    axes[0, 0].plot(np.log(loss_arr), label="loss", color="blue")
+    axes[0, 0].set_xlabel("Epoch")
+    axes[0, 0].set_ylabel("log_10(Loss)")
 
-    axes[1].plot(np.log(val_loss_arr), label="val_loss", color="green")
-    axes[1].set_xlabel("Epoch")
-    axes[1].set_ylabel("log_10(Val_Loss)")
+    axes[0, 1].plot(np.log(val_loss_arr), label="val_loss", color="green")
+    axes[0, 1].set_xlabel("Epoch")
+    axes[0, 1].set_ylabel("log_10(Val_Loss)")
 
-    return fig
+    axes[1, 0].plot(np.diff(np.log(loss_arr)), label="loss", color="blue")
+    axes[1, 0].set_xlabel("Epoch")
+    axes[1, 0].set_ylabel("d log_10(Loss)")
+
+    axes[1, 1].plot(np.diff(np.log(val_loss_arr)), label="val_loss", color="green")
+    axes[1, 1].set_xlabel("Epoch")
+    axes[1, 1].set_ylabel("d log_10(Val_Loss)")
+
+    axes[2, 0].plot(np.diff(np.log(loss_arr), n=2), label="loss", color="blue")
+    axes[2, 0].set_xlabel("Epoch")
+    axes[2, 0].set_ylabel("d2 log_10(Loss)")
+
+    axes[2, 1].plot(np.diff(np.log(val_loss_arr), n=2), label="val_loss", color="green")
+    axes[2, 1].set_xlabel("Epoch")
+    axes[2, 1].set_ylabel("d2 log_10(Val_Loss)")
+
+    # return fig
 
 
 def plot_uncertainty(mass_table, ax=None, bin_edges=[0, 1, 2, 3]):
@@ -164,6 +180,10 @@ def plot_deviation(all_mass_table, ax=None):
     return fig, ax
 
 
+def analyse_single_variant(mass_table_file):
+    return
+
+
 def main(file):
     # Get file
     mass_table_file = ""
@@ -186,8 +206,8 @@ def main(file):
 
     # Plot
     # f_unc, ax_unc = plot_uncertainty(mass_table)
-    f_unca, ax_unca = plot_uncertainty_all(mass_table)
-    f_dev, ax_dev = plot_deviation(all_mass_table)
+    # f_unca, ax_unca = plot_uncertainty_all(mass_table)
+    # f_dev, ax_dev = plot_deviation(all_mass_table)
     # f_loss, ax_loss = plot_loss(file)
 
 
