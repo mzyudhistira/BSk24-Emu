@@ -78,7 +78,7 @@ def sequential_model(
     for neuron in neurons:
         model.add(layers.Dense(neuron, activation=activation_function))
 
-    model.add(layer.Dense(1))
+    model.add(layers.Dense(1))
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
     return model

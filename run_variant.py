@@ -52,7 +52,7 @@ def run(param):
     # Start training
     training_label = label
     training_batches = [32, 16, 4]
-    training_epochs = [1000, 200, 50]
+    training_epochs = [1, 1, 1]
     with tf.device("/GPU:0"):
         history_1, history_2, history_3, best_weights = fine_grain_training(
             model,
