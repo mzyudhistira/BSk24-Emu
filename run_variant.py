@@ -3,7 +3,6 @@ import random
 
 import numpy as np
 import pandas as pd
-from keras import models, layers, callbacks
 
 from input import *
 from model import *
@@ -18,7 +17,7 @@ def run(param):
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     # Extract parameters
-    variant_sample, mult, label = param
+    variant_sample, neurons, label = param
 
     # Generate input data
     bsk24_param = BSk24
@@ -47,7 +46,7 @@ def run(param):
     # normalize_input(data_train, data_test, data_val, input_data, N_input)
 
     # Initialize the model
-    model = wouter_model(N_input, "rmsprop", k=mult)
+    model = sequential_model(N_input, neurons)
     model.summary()
 
     # Start training
@@ -65,7 +64,7 @@ def run(param):
         )
 
     # Make prediction
-    model = wouter_model(N_input, "adadelta", k=mult)
+    model = sequential_model(N_input, neurons)
     model.load_weights(best_weights)
 
     selected_varian = select_varian(variant_sample, data="ext")
@@ -94,11 +93,11 @@ def run(param):
 
 def main():
     variant = 3123
-    neurons = list(range(1, 5))
-    labels = [f"Variant {variant} with {x}*neurons" for x in range(1, 5)]
+    neurons = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    labels = [f"Variant {variant} with arch_id {x}" for x in range(1, len(neurons) + 1)]
     observed_effect = []
 
-    for i in range(4):
+    for i in range(len(neurons)):
         test_param = [variant, neurons[i], labels[i]]
         effect = run(test_param)
         observed_effect.append(effect)
@@ -106,15 +105,16 @@ def main():
     observed_effect = np.array(observed_effect)
     df = pd.DataFrame(
         {
-            "Variant": [variant] * 4,
-            "neurons_mult_f": neurons,
+            "variant": [variant] * len(neurons),
+            "arch_id": list(range(1, len(neurons) + 1)),
+            "neurons": neurons,
             "rms_dev": observed_effect[:, 0],
             "avg_dev": observed_effect[:, 1],
             "last_loss": observed_effect[:, 2],
         }
     )
 
-    df.to_csv("data/output/250505/neurons_effect.csv", index=False)
+    df.to_csv("data/output/250505/neurons_effect_custom.csv", index=False)
 
 
 if __name__ == "__main__":
