@@ -17,7 +17,7 @@ def run(param):
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     # Extract parameters
-    variant_sample, neurons, label = param
+    variant_sample, N_input, label = param
 
     # Generate input data
     bsk24_param = BSk24
@@ -31,28 +31,30 @@ def run(param):
 
     selected_variant_sample = (
         bsk24_variants_mass_table.groupby("varian_id", group_keys=False)
-        .apply(lambda x: x.sample(frac=0.4))
+        .apply(lambda x: x.sample(frac=1))
         .reset_index(drop=True)
     )
 
     z = selected_variant_sample["Z"].values[:, None]
     n = selected_variant_sample["N"].values[:, None]
     m = selected_variant_sample["m"].values[:, None]
-    input_data = np.concatenate((n, z, m), axis=1)
-    N_input = 2
+    input_data, Nin = generate_wouters_input_data(n, z, m, nin=N_input)
+    # input_data = np.concatenate((n, z, m), axis=1)
+    # N_input = 2
 
     np.random.shuffle(input_data)
     data_train, data_test, data_val = split_input(input_data, 0.8, 0.1, 0.1)
     # normalize_input(data_train, data_test, data_val, input_data, N_input)
 
     # Initialize the model
-    model = sequential_model(N_input, neurons)
+    model = wouter_model(N_input, "rmsprop")
     model.summary()
 
     # Start training
     training_label = label
     training_batches = [32, 16, 4]
     training_epochs = [1, 1, 1]
+
     with tf.device("/GPU:0"):
         history_1, history_2, history_3, best_weights = fine_grain_training(
             model,
@@ -64,7 +66,7 @@ def run(param):
         )
 
     # Make prediction
-    model = sequential_model(N_input, neurons)
+    model = wouter_model(N_input, "adagrad")
     model.load_weights(best_weights)
 
     selected_varian = select_varian(variant_sample, data="ext")
@@ -72,7 +74,8 @@ def run(param):
     n = selected_variant_sample["N"].values[:, None]
     m = selected_variant_sample["m"].values[:, None]
 
-    test_input = np.concatenate((n, z, m), axis=1)
+    test_input, Nin = generate_wouters_input_data(n, z, m, nin=N_input)
+    # test_input = np.concatenate((n, z, m), axis=1)
     # normalise(test_input)
 
     result = generate_mass_table(model, test_input, training_label)
@@ -93,28 +96,27 @@ def run(param):
 
 def main():
     variant = 3123
-    neurons = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    labels = [f"Variant {variant} with arch_id {x}" for x in range(1, len(neurons) + 1)]
+    n_input = list(range(2, 11))
+    labels = f"no_input={n_input}"
     observed_effect = []
 
-    for i in range(len(neurons)):
-        test_param = [variant, neurons[i], labels[i]]
+    for i in range(len(n_input)):
+        test_param = [variant, n_input[i], labels[i]]
         effect = run(test_param)
         observed_effect.append(effect)
 
     observed_effect = np.array(observed_effect)
     df = pd.DataFrame(
         {
-            "variant": [variant] * len(neurons),
-            "arch_id": list(range(1, len(neurons) + 1)),
-            "neurons": neurons,
+            "variant": [variant] * len(n_input),
+            "number_of_input": n_input,
             "rms_dev": observed_effect[:, 0],
             "avg_dev": observed_effect[:, 1],
             "last_loss": observed_effect[:, 2],
         }
     )
 
-    df.to_csv("data/output/250505/neurons_effect_custom.csv", index=False)
+    df.to_csv("data/output/250512/no_input.csv", index=False)
 
 
 if __name__ == "__main__":

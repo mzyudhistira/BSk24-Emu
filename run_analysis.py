@@ -11,7 +11,7 @@ from config import *
 def plot_loss(mass_table_file):
     result_name = mass_table_file[:-4]
     batches = [32, 16, 4]
-    epochs = [1200, 400, 100]
+    epochs = [8000, 2000, 500]
     loss_dir = TRAINING_DATA_DIR / "loss"
     loss_file = [
         loss_dir
@@ -30,7 +30,7 @@ def plot_loss(mass_table_file):
     loss_arr = [item for sublist in loss_data for item in sublist]
     val_loss_arr = [item for sublist in val_loss_data for item in sublist]
 
-    fig, axes = plt.subplots(3, 2, figsize=(12, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
     axes[0, 0].plot(np.log(loss_arr), label="loss", color="blue")
     axes[0, 0].set_xlabel("Epoch")
@@ -48,13 +48,13 @@ def plot_loss(mass_table_file):
     axes[1, 1].set_xlabel("Epoch")
     axes[1, 1].set_ylabel("d log_10(Val_Loss)")
 
-    axes[2, 0].plot(np.diff(np.log(loss_arr), n=2), label="loss", color="blue")
-    axes[2, 0].set_xlabel("Epoch")
-    axes[2, 0].set_ylabel("d2 log_10(Loss)")
-
-    axes[2, 1].plot(np.diff(np.log(val_loss_arr), n=2), label="val_loss", color="green")
-    axes[2, 1].set_xlabel("Epoch")
-    axes[2, 1].set_ylabel("d2 log_10(Val_Loss)")
+    # axes[2, 0].plot(np.diff(np.log(loss_arr), n=2), label="loss", color="blue")
+    # axes[2, 0].set_xlabel("Epoch")
+    # axes[2, 0].set_ylabel("d2 log_10(Loss)")
+    #
+    # axes[2, 1].plot(np.diff(np.log(val_loss_arr), n=2), label="val_loss", color="green")
+    # axes[2, 1].set_xlabel("Epoch")
+    # axes[2, 1].set_ylabel("d2 log_10(Val_Loss)")
 
     # return fig
 

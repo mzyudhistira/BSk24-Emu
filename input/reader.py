@@ -112,6 +112,7 @@ def get_bsk24_varians_ext():
     file = "bsk24_varians_ext.parquet"
     df = pd.read_parquet(input_data_dir / file)
     df.drop("rms0", axis=1, inplace=True)
+    print(df.head())
 
     return df
 
@@ -120,6 +121,7 @@ def get_bsk24_varians_ext_mass_table():
     file = "bsk24_varians_ext_mass_table.parquet"
     df = pd.read_parquet(input_data_dir / file)
 
+    df = df[~(df["Z"] == 81) & (df["N"] > 150)]
     return df
 
 

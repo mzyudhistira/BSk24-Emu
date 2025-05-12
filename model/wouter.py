@@ -46,7 +46,7 @@ def wouter_model(N_input, optimizer):
     # mae = mean average error
     # loss : what will be minimize
     # metrics : what will be shown
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss="mse", metrics=["mae"])
+    model.compile(optimizer=optimizer, loss="mse", metrics=["mae"])
 
     return model
 
@@ -75,6 +75,7 @@ def sequential_model(
     model = models.Sequential()
     model.add(Input(shape=(N_input,)))
 
+    print(neurons)
     for neuron in neurons:
         model.add(layers.Dense(neuron, activation=activation_function))
 

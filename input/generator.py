@@ -38,7 +38,12 @@ def normalize_params(variant_mass_table):
 
 
 def generate_wouters_input_data(
-    N, Z, binding_energy, NMN=[8, 20, 28, 50, 82, 126], PNM=[8, 20, 28, 50, 82, 126]
+    N,
+    Z,
+    binding_energy,
+    NMN=[8, 20, 28, 50, 82, 126],
+    PNM=[8, 20, 28, 50, 82, 126],
+    nin=10,
 ):
     """
     Generate a complete set of nuclear data from the nuclear masses.
@@ -67,12 +72,14 @@ def generate_wouters_input_data(
 
     # Size of the input, i.e. the number of parameters passed in to the MLNN for
     # any given input
-    N_input = 10
+    # N_input = 10
+    N_input = nin
     A = N + Z
 
     # Creating a complete data set from the (N,Z,BE)-data the table
     # Note that this has N_input + 1 columns: we store the binding energy here too
-    complete_dat = np.zeros((len(N), N_input + 1))
+    # complete_dat = np.zeros((len(N), N_input + 1))
+    complete_dat = np.zeros((len(N), 10 + 1))
 
     for i in range(len(N)):
         # - - - - - - - - - - - - - - - - - -
@@ -107,8 +114,10 @@ def generate_wouters_input_data(
         complete_dat[i, 9] = dist_Z
         complete_dat[i, 10] = binding_energy[i]
         # - - - - - - - - - - - - - - - -
+        ret = np.concatenate([complete_dat[:, :nin], complete_dat[:, -1:]], axis=1)
 
-    return complete_dat, N_input
+    # return complete_dat, N_input
+    return ret, N_input
 
 
 def modified_wouter(
