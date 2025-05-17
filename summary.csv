@@ -1,0 +1,5 @@
+datetime,run_name,run_config,loss,val_loss,rms_dev,mae,std_diff,output_file,run_time,note
+2025-05-16 12:21,test,data/run/test.toml,data/result/2025-05-16 12:21_test/loss.dat,data/result/2025-05-16 12:21_test/val_loss.dat,0.7140023378601545,0.007101728731466064,0.7139670187892372,data/result/2025-05-16 12:21_test/result.csv,0:00:13.753124,sample note
+2025-05-16 12:22,test,data/run/test.toml,data/result/2025-05-16 12:22_test/loss.dat,data/result/2025-05-16 12:22_test/val_loss.dat,0.5677807095122224,-0.08138246364516155,0.5619179910852176,data/result/2025-05-16 12:22_test/result.csv,0:00:32.467748,sample note
+2025-05-16 12:25,test,data/run/test.toml,data/result/2025-05-16 12:25_test/loss.dat,data/result/2025-05-16 12:25_test/val_loss.dat,0.5226733524400361,-0.06107286310434129,0.5190929962378076,data/result/2025-05-16 12:25_test/result.csv,0:01:50.086238,sample note
+2025-05-17 20:43,test,data/run/test.toml,data/result/2025-05-17 20:43_test/loss.dat,data/result/2025-05-17 20:43_test/val_loss.dat,0.8631505021547238,0.008084764179016846,0.8631126380479675,data/result/2025-05-17 20:43_test/result.csv,0:00:06.147783,sample note
