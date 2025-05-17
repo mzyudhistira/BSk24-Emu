@@ -11,7 +11,7 @@ from config import *
 def plot_loss(mass_table_file):
     result_name = mass_table_file[:-4]
     batches = [32, 16, 4]
-    epochs = [8000, 2000, 500]
+    epochs = [1500, 300, 50]
     loss_dir = TRAINING_DATA_DIR / "loss"
     loss_file = [
         loss_dir
