@@ -27,23 +27,22 @@ def run(config):
 
     """
 
-    print(input.load.load_df('BSk24_variants_ext_mass_table').head())
-    # # Load run config
-    # run_param = utils.run.load_param(config)
-    # start_time = datetime.now()
-    # run_datetime = start_time.strftime("%Y-%m-%d %H:%M")
-    #
-    # # Initialize the directories
-    # utils.file.initialize_directory()
-    # run_dir = utils.file.initialize_run_result_dir(run_param, run_datetime)
-    # run_param["run"]["dir"] = run_dir
-    #
-    # # Running the pipeline
-    # input_obj = input.build.Input(run_param)
-    #
-    # model_obj = model.build.Model(input_obj, run_param)
-    # model_obj.model.summary()
-    #
+    # Load run config
+    run_param = utils.run.load_param(config)
+    start_time = datetime.now()
+    run_datetime = start_time.strftime("%Y-%m-%d %H:%M")
+
+    # Initialize the directories
+    utils.file.initialize_directory()
+    run_dir = utils.file.initialize_run_result_dir(run_param, run_datetime)
+    run_param["run"]["dir"] = run_dir
+
+    # Running the pipeline
+    input_obj = input.build.Input(run_param)
+
+    model_obj = model.build.Model(input_obj, run_param)
+    model_obj.model.summary()
+
     # train_obj = training.train.TrainModel(run_param)
     # train_obj.run_training(input_obj, model_obj)
     # test_result = output.test.Test(input_obj, model_obj, train_obj, run_param)
