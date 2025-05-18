@@ -43,8 +43,9 @@ def run(config):
     model_obj = model.build.Model(input_obj, run_param)
     model_obj.model.summary()
 
-    # train_obj = training.train.TrainModel(run_param)
-    # train_obj.run_training(input_obj, model_obj)
+    train_obj = training.train.TrainModel(run_param)
+    train_obj.run_training(input_obj, model_obj)
+    analysis.plot.plot_loss(train_obj.loss, train_obj.val_loss)
     # test_result = output.test.Test(input_obj, model_obj, train_obj, run_param)
     #
     # # Writing run summary
