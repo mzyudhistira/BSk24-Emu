@@ -45,38 +45,38 @@ def run(config):
 
     train_obj = training.train.TrainModel(run_param)
     train_obj.run_training(input_obj, model_obj)
+
+    test_result = output.test.Test(input_obj, model_obj, train_obj, run_param)
     analysis.plot.plot_loss(train_obj.loss, train_obj.val_loss)
-    # test_result = output.test.Test(input_obj, model_obj, train_obj, run_param)
-    #
-    # # Writing run summary
-    # analysis.plot.plot_loss(train_obj.loss, train_obj.val_loss)
-    # end_time = datetime.now()
-    # run_time = end_time - start_time
-    #
-    # run_summary = [
-    #     run_datetime,
-    #     run_param["run"]["name"],
-    #     config,
-    #     train_obj.loss,
-    #     train_obj.val_loss,
-    #     test_result.rms_dev,
-    #     test_result.mae,
-    #     test_result.std_diff,
-    #     test_result.output,
-    #     run_time,
-    #     run_param["run"]["note"],
-    # ]
-    #
-    # with open("summary.csv", "a", newline="") as summary_file:
-    #     writer = csv.writer(summary_file)
-    #
-    #     run_summary = [
-    #         [x if x is not None else "" for x in run_summary]
-    #     ]  # Replace None with empty string
-    #     writer.writerows(run_summary)
-    #
-    # return run_summary
-    #
+
+    # Writing run summary
+    end_time = datetime.now()
+    run_time = end_time - start_time
+
+    run_summary = [
+        run_datetime,
+        run_param["run"]["name"],
+        config,
+        train_obj.loss,
+        train_obj.val_loss,
+        test_result.rms_dev,
+        test_result.mae,
+        test_result.std_diff,
+        test_result.output,
+        run_time,
+        run_param["run"]["note"],
+    ]
+
+    with open("summary.csv", "a", newline="") as summary_file:
+        writer = csv.writer(summary_file)
+
+        run_summary = [
+            [x if x is not None else "" for x in run_summary]
+        ]  # Replace None with empty string
+        writer.writerows(run_summary)
+
+    return run_summary
+
 
 def main():
     file, parallel = utils.run.parse_args()

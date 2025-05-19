@@ -1,14 +1,14 @@
 # Introduction
-This repository is a template ML pipeline that can be used to do any deep learning calculation. It is made using Keras Boston Housing as an example.
-This is still a working progress. Things to do:
-- [] Make analysis example
-- [] Make interactive cli program
+This is my thesis code repository to emulate BSk24 model for nuclear mass prediction.
+
 
 # Installation
 Ensure the correct dependencies are installed. This repo is build with conda and linux in mind.
 ```bash
 conda env create -f environment.yml
 ```
+
+Download the [Dataset](https://kuleuven-my.sharepoint.com/:f:/g/personal/zhafran_yudhistira_student_kuleuven_be/EjqZes4Jc-9CrKCjDHCzBHYBwfsF8eR3XCN1P9GUXJqsIw?e=QXla8f) and put it in the main directory. If you have downloaded the previous dataset, just replace all 'varian' in `data/input` with 'variant'.
 
 # Usage
 1. Make sure the program is run in the correct environment
