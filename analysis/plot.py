@@ -26,6 +26,20 @@ def plot_loss(loss, val_loss):
     fig.savefig(f"{save_dir}/loss_plot.png")
 
 
+def nuclear_landscape(N, Z, val, title="", colourbar_label=""):
+    fig, ax = plt.subplots(1, 1, figsize=(9, 5))
+
+    scatter = ax.scatter(N, Z, c=val, s=4, cmap="inferno")
+    ax.set_title(title)
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+
+    colour_bar = fig.colorbar(scatter, ax=ax)
+    colour_bar.set_label(colourbar_label)
+
+    set_tick(ax)
+
+
 def set_tick(ax):
     """Set the tick of any plot to have 4 minor ticks inside major ticks
 

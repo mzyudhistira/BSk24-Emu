@@ -1,6 +1,7 @@
 import time
 from pathlib import Path
 import shutil
+import random
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint, Callback
@@ -31,7 +32,7 @@ def simple(data, model, training_param, file_path):
     model_checkpoint_callback = ModelCheckpoint(
         save_weights_only=True,
         save_best_only=True,
-        monitor="val_mae",
+        monitor="val_loss",
         mode="min",
         filepath=best_weights,
     )
@@ -80,18 +81,21 @@ def multi_stage(data, model, training_param, file_path):
     cache_folder = Path("data/cache")
     cache_folder.mkdir(parents=True, exist_ok=True)
 
+    hex_chars = "0123456789ABCDEF"
+    rnd_hex = ["".join(random.choices(hex_chars, k=5)) for i in range(3)]
+
     for i in range(3):
+        random_hex = "".join(random.choices(hex_chars, k=5))
         simple_files.append(
             [
                 best_weights,
                 last_weights,
-                cache_folder / f"loss{i}.dat",
-                cache_folder / f"val_loss{i}.dat",
+                cache_folder / f"loss{i}_{rnd_hex[i]}.dat",
+                cache_folder / f"val_loss{i}_{rnd_hex[i]}.dat",
             ]
         )
-    print(simple_files)
 
-    # Train the model
+    # Train the modl
     for i in range(3):
         print(f"{'-'*20}")
         print(f"Training step: {i+1}")
@@ -100,11 +104,11 @@ def multi_stage(data, model, training_param, file_path):
     # Combine loss and val_loss from all training steps
     loss_data = [
         np.loadtxt(file).flatten()
-        for file in [cache_folder / f"loss{i}.dat" for i in range(3)]
+        for file in [cache_folder / f"loss{i}_{rnd_hex[i]}.dat" for i in range(3)]
     ]
     val_loss_data = [
         np.loadtxt(file).flatten()
-        for file in [cache_folder / f"val_loss{i}.dat" for i in range(3)]
+        for file in [cache_folder / f"val_loss{i}_{rnd_hex[i]}.dat" for i in range(3)]
     ]
 
     loss_arr = [item for sublist in loss_data for item in sublist]
