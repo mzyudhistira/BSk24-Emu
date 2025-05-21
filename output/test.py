@@ -22,6 +22,7 @@ class Test:
         total_feature = np.concatenate([train_data[0], val_data[0], test_data[0]])
         total_target = np.concatenate([train_data[1], val_data[1], test_data[1]])
 
+        model_obj.model.compile(optimizer="adadelta")
         prediction = model_obj.model.predict(total_feature).flatten()
         diff = total_target - prediction
 

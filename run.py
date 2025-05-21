@@ -2,6 +2,7 @@ import os
 import multiprocessing
 from datetime import datetime
 import csv
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -26,11 +27,12 @@ def run(config):
                             rms deviation, mae,std difference, output file, run time and note
 
     """
-
     # Load run config
     run_param = utils.run.load_param(config)
     start_time = datetime.now()
     run_datetime = start_time.strftime("%Y-%m-%d %H:%M")
+    cache_folder = Path("data/cache")
+    cache_folder.mkdir(parents=True, exist_ok=True)
 
     # Initialize the directories
     utils.file.initialize_directory()
@@ -74,6 +76,8 @@ def run(config):
             [x if x is not None else "" for x in run_summary]
         ]  # Replace None with empty string
         writer.writerows(run_summary)
+
+    shutil.rmtree(cache_folder)
 
     return run_summary
 

@@ -14,7 +14,7 @@ run_dir_name = datetime.now().strftime("%Y-%m-%d %H:%M")
 run_dir = Path(f"data/run/{run_dir_name}")
 run_dir.mkdir(parents=True, exist_ok=True)
 
-multiple_config = run_dir / "mult.toml"
+multiple_config = run_dir / "mult.txt"
 
 for i in range(1, 11):
     config = utils.run.load_param(base_config)

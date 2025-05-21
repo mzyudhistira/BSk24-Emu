@@ -1,6 +1,5 @@
 import time
 from pathlib import Path
-import shutil
 import random
 
 import numpy as np
@@ -81,6 +80,7 @@ def multi_stage(data, model, training_param, file_path):
     cache_folder = Path("data/cache")
     cache_folder.mkdir(parents=True, exist_ok=True)
 
+    # Random hex for temporary file to avoid overwriting files on parallel run
     hex_chars = "0123456789ABCDEF"
     rnd_hex = ["".join(random.choices(hex_chars, k=5)) for i in range(3)]
 
@@ -95,10 +95,14 @@ def multi_stage(data, model, training_param, file_path):
             ]
         )
 
-    # Train the modl
+    # Train the model
     for i in range(3):
         print(f"{'-'*20}")
         print(f"Training step: {i+1}")
+
+        if i == 2:
+            model.compile(optimizer="adagrad")
+
         simple(data, model, simple_param[i], simple_files[i])
 
     # Combine loss and val_loss from all training steps
@@ -116,4 +120,3 @@ def multi_stage(data, model, training_param, file_path):
     np.savetxt(loss_path, loss_arr)
     np.savetxt(val_loss_path, val_loss_arr)
 
-    shutil.rmtree(cache_folder)
