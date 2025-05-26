@@ -32,8 +32,6 @@ def run(config):
     run_param = utils.run.load_param(config)
     start_time = datetime.now()
     run_datetime = start_time.strftime("%Y-%m-%d %H:%M")
-    cache_folder = Path("data/cache")
-    cache_folder.mkdir(parents=True, exist_ok=True)
 
     # Initialize the directories
     utils.file.initialize_directory()
@@ -78,15 +76,19 @@ def run(config):
         ]  # Replace None with empty string
         writer.writerows(run_summary)
 
-    shutil.rmtree(cache_folder)
 
     return run_summary
 
 
 def main():
+    # Loading the configuration
     file, parallel = utils.run.parse_args()
     file_extension = os.path.splitext(file)[1]
     multiple_run_configs = file_extension == ".txt"
+
+    # Initialize cache folder
+    cache_folder = Path("data/cache")
+    cache_folder.mkdir(parents=True, exist_ok=True)
 
     if multiple_run_configs and parallel:
         print("Running in parallel")
@@ -104,6 +106,7 @@ def main():
         print("Running")
         run(file)
 
+    shutil.rmtree(cache_folder)
 
 if __name__ == "__main__":
     main()
