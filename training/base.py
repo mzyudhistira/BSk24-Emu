@@ -101,7 +101,7 @@ def multi_stage(data, model, training_param, file_path):
         print(f"Training step: {i+1}")
 
         if i == 2:
-            model.compile(optimizer="adagrad")
+            model.compile(optimizer="adagrad", loss="mse")
 
         simple(data, model, simple_param[i], simple_files[i])
 
