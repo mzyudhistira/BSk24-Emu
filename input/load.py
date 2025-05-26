@@ -24,6 +24,14 @@ BSk24_files = {
 }
 
 
+def load_ame20():
+    df = pd.read_csv("data/input/ame20.dat", delim_whitespace=True)
+    df["A"] = df["Z"] + df["N"]
+    df["m"] = df["BE"]
+
+    return df
+
+
 def load_df(dataset, type=""):
     """
     Load BSk24 dataset

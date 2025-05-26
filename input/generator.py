@@ -1,6 +1,7 @@
 import random
 
 import numpy as np
+from numpy.testing import tempdir
 import pandas as pd
 
 from . import load
@@ -44,17 +45,16 @@ def single_variant(param):
 
     # Feature selection
     # mass_table = feature.select_nuclei()
-    input_tensor = feature.nuclear_properties(input_data)
-    # input_tensor = preprocess.normalise(input_tensor)
-    np.random.shuffle(input_tensor)
-
+    input_data = load.load_ame20()
+    input_tensor, N_input = feature.nuclear_properties_w(input_data)
 
     # Preprocessing
-    input_data = preprocess.normalise(input_tensor)
+    np.random.shuffle(input_tensor)
+    input_tensor = preprocess.normalise(input_tensor)
     data_train, data_val, data_test = preprocess.split(
         input_tensor, percent_train, percent_val, percent_test
     )
-
+    #
     return {
         "train": extract_feature(data_train),
         "val": extract_feature(data_val),

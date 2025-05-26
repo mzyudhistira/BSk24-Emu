@@ -2,6 +2,8 @@ import toml
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
+
 import utils
 
 
@@ -15,11 +17,13 @@ run_dir = Path(f"data/run/{run_dir_name}")
 run_dir.mkdir(parents=True, exist_ok=True)
 
 multiple_config = run_dir / "mult.txt"
+percentage = np.linspace(0.1, 1, 10)
 
-for i in range(1, 11):
+for i in percentage:
     config = utils.run.load_param(base_config)
-    config["input"]["param"]["N_input"] = i
-    config_name = f"data/run/{run_dir_name}/config_{i}.toml"
+    config["run"]["name"] = f"Dataset={i*100:.1f}%"
+    config["input"]["param"]["variant_percentage"] = i
+    config_name = f"data/run/{run_dir_name}/config_{i:.1f}.toml"
 
     with open(config_name, "w") as f:
         toml.dump(config, f)

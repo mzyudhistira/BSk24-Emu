@@ -1,7 +1,6 @@
 # Introduction
 This is my thesis code repository to emulate BSk24 model for nuclear mass prediction.
 
-
 # Installation
 Ensure the correct dependencies are installed. This repo is build with conda and linux in mind.
 ```bash
@@ -13,7 +12,7 @@ Download the [Dataset](https://kuleuven-my.sharepoint.com/:f:/g/personal/zhafran
 # Usage
 1. Make sure the program is run in the correct environment
     ```bash
-    conda activate ann
+    conda activate tf
     ```
 
 2. Prepare the run configuration file
@@ -29,8 +28,6 @@ Download the [Dataset](https://kuleuven-my.sharepoint.com/:f:/g/personal/zhafran
         ```
         `-pl` or `-parallel` flag can be added to run the program in parallel
 
-    - cli.py: to run the program interactively
-
     - analysis.ipynb: consists of typical analysis that can be done
 
 # File Guideline
@@ -41,7 +38,7 @@ Store any data that are needed to be loaded in the project in the `data/` direct
 The run configuration file is written in [TOML format](https://toml.io/en/), this is normally stored in `data/run/` directory. The run config should consists of the following data.
 1. run : This include the name and note of the run
 2. input: This include module, generator, and param
-3. modele: This include module, genrator, and param
+3. model: This include module, genrator, and param
 4. training: This include module, method, and param
 
 An example of the run configuration file can be seen in `data/run/test.toml`

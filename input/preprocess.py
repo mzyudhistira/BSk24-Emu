@@ -36,8 +36,13 @@ def normalise(data):
     Returns:
         normalised_data (np array): normalised data
     """
-    mean = np.mean(data, axis=0)
-    std = np.std(data, axis=0)
-    normalised_data = (data - mean) / std
+    feature = data[:, :-1]
+    target = data[:, -1]
+
+    mean = np.mean(feature, axis=0)
+    std = np.std(feature, axis=0)
+    feature = (feature - mean) / std
+
+    normalised_data = np.column_stack((feature, target))
 
     return normalised_data
