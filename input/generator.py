@@ -45,8 +45,7 @@ def single_variant(param):
 
     # Feature selection
     # mass_table = feature.select_nuclei()
-    input_data = load.load_ame20()
-    input_tensor, N_input = feature.nuclear_properties_w(input_data)
+    input_tensor = feature.nuclear_properties(input_data)
 
     # Preprocessing
     np.random.shuffle(input_tensor)
