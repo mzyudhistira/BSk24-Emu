@@ -53,7 +53,7 @@ def single_variant(param):
     data_train, data_val, data_test = preprocess.split(
         input_tensor, percent_train, percent_val, percent_test
     )
-    #
+
     return {
         "train": extract_feature(data_train),
         "val": extract_feature(data_val),

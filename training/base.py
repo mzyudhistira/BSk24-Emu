@@ -1,9 +1,10 @@
 import time
 from pathlib import Path
-import random
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint, Callback
+
+from utils.string import generate_random_hex
 
 
 def simple(data, model, training_param, file_path):
@@ -61,14 +62,21 @@ def multi_stage(data, model, training_param, file_path):
         training_param (dict): Parameter of the training
         file_path (list): Filepath of the results
     """
+    # Extract variables
     best_weights, last_weights, loss_path, val_loss_path = file_path
 
     features, target = data["train"]
     val_features, val_target = data["val"]
-
-    # Initiate param and files for each simple training
     epochs = training_param["epoch"]
     batches = training_param["batch"]
+
+    # Initiate param and files for each simple training
+    cache_folder = Path("data/cache")
+    simple_files = []
+
+    rnd_hex = [
+        generate_random_hex() for i in range(3)
+    ]  # Random hex for temporary file to avoid overwriting files on parallel run
 
     simple_param = [
         {"epoch": epochs[0], "batch": batches[0]},
@@ -76,19 +84,15 @@ def multi_stage(data, model, training_param, file_path):
         {"weight": best_weights, "epoch": epochs[2], "batch": batches[2]},
     ]
 
-    simple_files = []
-    cache_folder = Path("data/cache")
-    cache_folder.mkdir(parents=True, exist_ok=True)
-
-    # Random hex for temporary file to avoid overwriting files on parallel run
-    hex_chars = "0123456789ABCDEF"
-    rnd_hex = ["".join(random.choices(hex_chars, k=5)) for i in range(3)]
+    best_weight_file = [
+        cache_folder / f"best_weights_{i}_{rnd_hex[i]}.weights.h5" for i in range(2)
+    ]
+    best_weight_file.append(best_weights)
 
     for i in range(3):
-        random_hex = "".join(random.choices(hex_chars, k=5))
         simple_files.append(
             [
-                best_weights,
+                best_weight_file[i],
                 last_weights,
                 cache_folder / f"loss{i}_{rnd_hex[i]}.dat",
                 cache_folder / f"val_loss{i}_{rnd_hex[i]}.dat",
@@ -101,6 +105,19 @@ def multi_stage(data, model, training_param, file_path):
         print(f"Training step: {i+1}")
 
         if i == 2:
+            # Find the training step with lowest val_loss, then load the corresponding weight
+            val_loss_old = np.loadtxt(simple_files[0][3])
+            val_loss_new = np.loadtxt(simple_files[1][3])
+
+            if min(val_loss_old) < min(val_loss_new):
+                print("-" * 20)
+                print("old is better")
+                simple_param[2]["weight"] = best_weight_file[0]
+
+            else:
+                simple_param[2]["weight"] = best_weight_file[1]
+
+            # Change model's optimizer
             model.compile(optimizer="adagrad", loss="mse")
 
         simple(data, model, simple_param[i], simple_files[i])
