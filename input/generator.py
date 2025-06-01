@@ -1,6 +1,7 @@
 import random
 
 import numpy as np
+from numpy.ma import mask_cols
 from numpy.testing import tempdir
 import pandas as pd
 
@@ -54,6 +55,12 @@ def single_variant(param):
     data_train, data_val, data_test = preprocess.split(
         input_tensor, percent_train, percent_val, percent_test
     )
+
+    # Replace test data with the whole variant
+    test_data = feature.select_variant(skyrme_param, mass_table, variant_id)
+    test_tensor = feature.nuclear_properties(test_data, N_input=N_input)
+    test_tensor, normalization_param = preprocess.normalise(test_tensor)
+    data_test = test_tensor
 
     return {
         "train": extract_feature(data_train),
