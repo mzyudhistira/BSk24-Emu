@@ -42,14 +42,15 @@ def single_variant(param):
     # Loading
     skyrme_param, mass_table = load.load_df("variant", variant_type)
     input_data = feature.select_variant(skyrme_param, mass_table, variant_id)
+    input_data = input_data.sample(frac=variant_percentage)
 
     # Feature selection
     # mass_table = feature.select_nuclei()
-    input_tensor = feature.nuclear_properties(input_data)
+    input_tensor = feature.nuclear_properties(input_data, N_input=N_input)
 
     # Preprocessing
     np.random.shuffle(input_tensor)
-    input_tensor = preprocess.normalise(input_tensor)
+    input_tensor, normalization_param = preprocess.normalise(input_tensor)
     data_train, data_val, data_test = preprocess.split(
         input_tensor, percent_train, percent_val, percent_test
     )
@@ -58,6 +59,7 @@ def single_variant(param):
         "train": extract_feature(data_train),
         "val": extract_feature(data_val),
         "test": extract_feature(data_test),
+        "normalization_param": normalization_param,
     }
 
 

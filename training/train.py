@@ -32,7 +32,9 @@ class TrainModel:
         module = importlib.import_module(f"training.{self.module}")
         method = getattr(module, self.method)
 
-        training_data, validation_data, _ = input_object.data
+        training_data = input_object.data
+        validation_data = input_object.data
+
         training_result = [
             self.best_weights,
             self.last_weights,

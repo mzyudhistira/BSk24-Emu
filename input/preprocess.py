@@ -45,4 +45,4 @@ def normalise(data):
 
     normalised_data = np.column_stack((feature, target))
 
-    return normalised_data
+    return normalised_data, [mean, std]

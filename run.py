@@ -47,7 +47,8 @@ def run(config):
     train_obj = training.train.TrainModel(run_param)
     train_obj.run_training(input_obj, model_obj)
 
-    test_result = output.test.Test(input_obj, model_obj, train_obj, run_param)
+    test_result = output.test.Test(input_obj, model_obj, run_param)
+
     analysis.plot.plot_loss(train_obj.loss, train_obj.val_loss)
 
     # Writing run summary
@@ -75,7 +76,6 @@ def run(config):
             [x if x is not None else "" for x in run_summary]
         ]  # Replace None with empty string
         writer.writerows(run_summary)
-
 
     return run_summary
 
@@ -107,6 +107,7 @@ def main():
         run(file)
 
     shutil.rmtree(cache_folder)
+
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -5,6 +7,9 @@ from matplotlib.ticker import AutoMinorLocator
 
 
 def plot_loss(loss, val_loss):
+    loss = Path(loss)
+    val_loss = Path(val_loss)
+
     loss_data = np.log10(np.loadtxt(loss))
     val_loss_data = np.log10(np.loadtxt(val_loss))
     save_dir = loss.parent
