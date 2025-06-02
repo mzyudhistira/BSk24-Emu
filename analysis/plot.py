@@ -6,7 +6,14 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 
 
-def plot_loss(loss, val_loss):
+def plot_loss(loss, val_loss) -> None:
+    """
+    Plot loss and validation loss of the training
+
+    Args:
+        loss (str/Path): Path of the loss file
+        val_loss (str/Path): Path of the validation loss file
+    """
     loss = Path(loss)
     val_loss = Path(val_loss)
 
@@ -31,7 +38,35 @@ def plot_loss(loss, val_loss):
     fig.savefig(f"{save_dir}/loss_plot.png")
 
 
-def nuclear_landscape(N, Z, val, title="", colourbar_label=""):
+def plot_rms(x, y, x_label) -> None:
+    """
+    Make plot of RMS Deviation
+
+    Args:
+        x (np arr): X axis
+        y (np arr): Y axis (RMS Deviation)
+        x_label (str): label of x
+    """
+    fig, ax = plt.subplots()
+
+    ax.plot(x, y)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel("RMS Deviation (MeV)")
+    ax.set_ylim(bottom=0)
+    set_tick(ax)
+
+
+def nuclear_landscape(N, Z, val, title="", colourbar_label="") -> None:
+    """
+    Make plot on the nuclear landscape
+
+    Args:
+        N (np arr): Neutron
+        Z (np arr): Proton
+        val (np arr): Plotted value
+        title (str): Title of the plot, default to blank
+        colourbar_label (str): Label of the colourbar, default to blank
+    """
     fig, ax = plt.subplots(1, 1, figsize=(9, 5))
 
     scatter = ax.scatter(N, Z, c=val, s=4, cmap="inferno")
