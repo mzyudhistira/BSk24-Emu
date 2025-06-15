@@ -47,6 +47,8 @@ def single_variant(param):
 
     # Feature selection
     # mass_table = feature.select_nuclei()
+    input_data = feature.rm_Z81(input_data)
+    input_data = feature.relative_mass(input_data)
     input_tensor = feature.nuclear_properties(input_data, N_input=N_input)
 
     # Preprocessing
@@ -58,6 +60,8 @@ def single_variant(param):
 
     # Replace test data with the whole variant
     test_data = feature.select_variant(skyrme_param, mass_table, variant_id)
+    test_data = feature.rm_Z81(test_data)
+    test_data = feature.relative_mass(test_data)
     test_tensor = feature.nuclear_properties(test_data, N_input=N_input)
     test_tensor, normalization_param = preprocess.normalise(test_tensor)
     data_test = test_tensor

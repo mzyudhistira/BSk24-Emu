@@ -7,14 +7,15 @@ from input.feature import skyrme_param
 
 BSk24_files = {
     "skyrme_param": {
-        "reg": "bsk24.csv",
+        "reg_full": "bsk24.csv",
+        "reg_exp": "bsk24.csv",
         "variant_exp": "bsk24_variants.parquet",
         "variant_exp_sample": "bsk24_variants_sample.csv",
         "variant_ext": "bsk24_variants_ext.parquet",
         "variant_ext_sample": "bsk24_variants_ext_sample.parquet",
     },
     "mass_table": {
-        "reg": "bsk24_mass_table.csv",
+        "reg_full": "bsk24_mass_table.csv",
         "reg_exp": "bsk24_mass_table_exp.csv",
         "variant_exp": "bsk24_variants_mass_table.parquet",
         "variant_exp_sample": "bsk24_variants_sample_mass_table.csv",
@@ -32,14 +33,15 @@ def load_ame20():
     return df
 
 
-def load_df(dataset, type=""):
+def load_df(dataset, type):
     """
     Load BSk24 dataset
 
     Args:
         dataset (string): Type of BSk24 data: reg or variant
-        type (str): Type of the dataset, default to ''. Possible values:
+        type (str): Type of the dataset. Possible values:
                     reg
+                    - full : Full mass
                     - exp : Experimental mass
 
                     variant

@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from . import load
+
 
 def select_variant(skyrme_param_dataset, mass_table, variant_id):
     """
@@ -51,6 +53,8 @@ def select_nuclei(mass_table, kind):
 
 
 def rm_Z81(mass_table):
+    mass_table = mass_table[~((mass_table["Z"] == 81) & (mass_table["N"] > 155))]
+
     return mass_table
 
 
@@ -81,7 +85,7 @@ def nuclear_properties(
 
     # Building the input tensor
     n_of_rows = N.shape[0]
-    complete_dat = np.zeros((n_of_rows, N_input + 1))
+    complete_dat = np.zeros((n_of_rows, 11))
 
     # Basic nuclear information
     complete_dat[:, 0] = N  # Neutron Number
@@ -110,6 +114,32 @@ def nuclear_properties(
     )
 
     return returned_dat
+
+
+def relative_mass(variant_mass_table):
+    """
+    Change the mass table's mass to be the mass difference wrt BSk24
+
+    Args:
+        variant_mass_table (pd df): Mass table of the variant(s)
+
+    Returns:
+
+    """
+    _, bsk_mass_table = load.load_df("reg", "full")
+    tmp_df = pd.merge(
+        variant_mass_table,
+        bsk_mass_table,
+        how="inner",
+        on=["Z", "N"],
+        suffixes=("_v", "_o"),
+    )
+
+    variant_mass_table = pd.merge(variant_mass_table, tmp_df, how="inner")
+    variant_mass_table["m"] = variant_mass_table["m_v"] - variant_mass_table["m_o"]
+    variant_mass_table.drop(columns=["A_v", "m_v", "A_o", "m_o"], inplace=True)
+
+    return variant_mass_table
 
 
 def skyrme_param():

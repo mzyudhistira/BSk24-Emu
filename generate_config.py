@@ -18,19 +18,34 @@ run_dir = Path(f"data/run/{run_dir_name}")
 run_dir.mkdir(parents=True, exist_ok=True)
 
 multiple_config = run_dir / "mult.txt"
-percentage = np.linspace(0.1, 1, 10)
-variant_id = random.randint(1, 11023)
+percentage = np.linspace(0.1, 1, 5)
+# variant_id = random.randint(1, 11023)
+variant_id = [
+    13,
+    1529,
+    1068,
+    2498,
+    2494,
+    2480,
+    2482,
+    12,
+    1,
+    2484,
+    2481,
+    15,
+    419,
+    694,
+    1420,
+]
 
-for i in percentage:
+for i in variant_id:
     config = utils.run.load_param(base_config)
-    iw = float(round(i, 1))
 
-    config["run"]["name"] = f"Variant:{variant_id}, Dataset:{iw*100*0.8}%"
-    config["run"]["note"] = float(iw * 100 * 0.8)
-    config["input"]["param"]["dataset"]["variant_percentage"] = iw
-    config["input"]["param"]["dataset"]["variant_id"] = variant_id
+    config["run"]["name"] = f"Variant_{i}"
+    config["input"]["param"]["dataset"]["variant_percentage"] = 1
+    config["input"]["param"]["dataset"]["variant_id"] = i
 
-    config_name = f"data/run/{run_dir_name}/config_{iw}.toml"
+    config_name = f"data/run/{run_dir_name}/config_{i}.toml"
 
     with open(config_name, "w") as f:
         toml.dump(config, f)
