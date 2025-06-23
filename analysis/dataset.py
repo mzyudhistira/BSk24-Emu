@@ -3,22 +3,43 @@ import pandas as pd
 
 
 def extract_result(result_row):
-    mass_table = load_mass_table(result_row)
+    """
+    Extract dataset moment from a mass table
 
-    percent_error = rms(mass_table["difference"]) * 100 / rms(mass_table["target"])
-    return [percent_error.mean()]
+    Args:
+        result_row (pd row): Row of the summary dataframe
 
+    Returns:
+        results (dic): Dictionary of RMS and dataset moment
 
-def extract_variant_data(output_file):
+    """
+    mass_table = pd.read_csv(
+        result_row["output_file"], usecols=["target", "prediction"]
+    )
 
-    return rms, std
+    moment = lambda column, name: {
+        f"{name}_rms": rms(column),
+        f"{name}_mean": column.mean(),
+        f"{name}_std": column.std(),
+        f"{name}_skew": column.skew(),
+    }
 
-
-def load_mass_table(result_row):
-    mass_table = pd.read_csv(result_row["output_file"])
-
-    return mass_table
+    return (
+        {"rms_dev": rms(mass_table["prediction"] - mass_table["target"])}
+        | moment(mass_table["target"], "variant")
+        | moment(mass_table["prediction"], "ml")
+    )
 
 
 def rms(array):
+    """
+    Calculate RMSE
+
+    Args:
+        array (np arr): Array to calculate
+
+    Returns:
+        rms (float)
+
+    """
     return np.sqrt((array**2).mean())
