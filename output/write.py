@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from output import postprocess
@@ -21,8 +22,8 @@ def generate_mass_table(feature, target, prediction, path) -> None:
 
     df = pd.DataFrame(
         {
-            "Z": Z.astype(int),
-            "N": N.astype(int),
+            "Z": np.rint(Z).astype(int),
+            "N": np.rint(N).astype(int),
             "target": target,
             "prediction": prediction,
             "difference": diff,
