@@ -1,0 +1,206 @@
+from pathlib import Path
+from math import sqrt
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import spearmanr
+
+from . import plot_utils
+
+
+def plot_me_bsk_comparison(path: str) -> None:
+    """Plot the mass excess predictions of BSk1-32 for A=195 chain. This plot is used in introduction.
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
+
+    # Load all HFB mass tables
+    files = [str(mt) for mt in Path("data/others/bsks_mt").iterdir()]
+    labels = [file.split("-")[0].split("/")[-1] for file in files]
+    labels.sort()
+    mass_tables = [pd.read_csv(file, skiprows=[0, 2], sep="\\s+") for file in files]
+
+    # Define  BSk32 Mass table and filter it
+    bsk32_mt = mass_tables[-1]
+    bsk32_mt["N"] = bsk32_mt["A"] - bsk32_mt["Z"]
+    bsk32_mt = bsk32_mt[(bsk32_mt["A"] == 195) & (bsk32_mt["N"] >= 110)]
+
+    # Plot experimental mass
+    ax.scatter(
+        bsk32_mt["N"].iloc[-10:],
+        bsk32_mt["Mexp-Mcal"].iloc[-10:],
+        label="Exp",
+        zorder=10,
+        color="black",
+    )
+
+    # Plot all mass excess relative to BSk-32
+    for i in range(20, len(files[:-1])):
+        ref = bsk32_mt[["N", "Mcal"]].rename(columns={"Mcal": "Mcal_ref"})
+
+        mass_table = mass_tables[i]
+        mass_table["N"] = mass_table["A"] - mass_table["Z"]
+        mass_table = mass_table[(mass_table["A"] == 195) & (mass_table["N"] >= 110)]
+        mass_table = mass_table.merge(ref, on="N", how="inner")
+
+        ax.plot(
+            mass_table["N"],
+            mass_table["Mcal"] - mass_table["Mcal_ref"],
+            # label=labels[i],
+            zorder=5,
+        )
+    ax.plot([], [], color="black", label="BSk21-31")
+
+    ax.set_xlabel("N")
+    ax.set_ylabel(r"$m - m_{\mathrm{BSk32}}\;(\mathrm{MeV})$")
+    ax.legend()
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_loss_convergence(path: str) -> None:
+    """Plot the convergence of loss and val loss of the initial model
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(12, 4.5)))
+
+    # Load the loss plot
+    loss_data = np.loadtxt("data/result/2025-06-01 19:31_Dataset=100.0%/loss.dat")
+
+    val_loss_data = np.loadtxt(
+        "data/result/2025-06-01 19:31_Dataset=100.0%/val_loss.dat"
+    )
+
+    # Plot loss
+    ax[0].plot(loss_data, color="blue", lw=0.6)
+    ax[0].set_xlabel("Epoch")
+    ax[0].set_ylabel(r"$\text{loss (MeV}^2)$")
+    ax[0].set_yscale("log")
+
+    # Plot val loss
+    ax[1].plot(val_loss_data, color="green", lw=0.6)
+    ax[1].set_xlabel("Epoch")
+    ax[1].set_ylabel(r"$\text{val loss (MeV}^2)$")
+    ax[1].set_yscale("log")
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_gap_nz() -> None:
+    data = dataset.build_gap_dataset()
+    print(data)
+
+
+def plot_gap_n_asymmetry():
+    fig, ax = plt.subplots(1, 2, figsize=(16, 6))
+    data = dataset.build_gap_dataset()
+
+    asymmetry_plot = ax[0].scatter(data["N"], data["Z"], c=data["as"], s=3)
+    fig.colorbar(asymmetry_plot, ax=ax[0], label="Asymmetry")
+    ax[0].set_xlabel("N")
+    ax[0].set_ylabel("Z")
+
+    as_list = [i for i in range(1, 60)]
+    iqr_list = []
+
+    for i in as_list:
+        test_data = data[data["as"] <= i]
+        iqr_list.append(
+            test_data["eps_delta"].quantile(0.75)
+            - test_data["eps_delta"].quantile(0.25)
+        )
+
+    ax[1].plot(as_list, iqr_list)
+    ax[1].set_xlabel("Asymmetry")
+    ax[1].set_ylabel(r"$\epsilon_\Delta$ (\%)")
+
+    plt.tight_layout()
+    fig.savefig("../5_Writing/chapters/4_full_scale/image/gap_n_asymmetry.png")
+    plt.close()
+
+
+def plot_sigma_propagation():
+    data = dataset.build_grouped_dataset()
+
+    fig, ax = plt.subplots(
+        1, 2, figsize=(16, 6), gridspec_kw={"width_ratios": [2.5, 1.5]}
+    )
+
+    # Uncertainty propagation
+    pivot = data.pivot(index="N", columns="Z", values="target_std")
+
+    N_vals = pivot.index.values
+    Z_vals = pivot.columns.values
+    sigma = pivot.values
+
+    dsigma_dN, dsigma_dZ = np.gradient(sigma, N_vals, Z_vals)
+    grad_N = pd.DataFrame(
+        dsigma_dN,
+        index=pivot.index,
+        columns=pivot.columns,
+    )
+
+    grad_Z = pd.DataFrame(
+        dsigma_dZ,
+        index=pivot.index,
+        columns=pivot.columns,
+    )
+
+    data = data.merge(
+        grad_N.stack().rename("dsigma_dn"),
+        left_on=["N", "Z"],
+        right_index=True,
+    )
+
+    data = data.merge(
+        grad_Z.stack().rename("dsigma_dz"),
+        left_on=["N", "Z"],
+        right_index=True,
+    )
+
+    data["dsigma"] = np.sqrt(data["dsigma_dn"] ** 2 + data["dsigma_dz"] ** 2)
+
+    plot = ax[0].scatter(data["N"], data["Z"], c=data["dsigma"], s=4, vmin=0, vmax=0.3)
+    fig.colorbar(plot, ax=ax[0], label=r"$\Delta\sigma$")
+
+    ax[0].set_xlabel("N")
+    ax[0].set_ylabel("Z")
+
+    # Gradiant distribution
+    hist, bins = np.histogram(np.abs(data["dsigma"]), bins=np.linspace(0, 3.5, 15))
+    iqr = []
+    mean = []
+    for i in range(1, len(bins)):
+        data_i = data[
+            (np.abs(data["eps"]) > bins[i - 1]) & (np.abs(data["eps"]) < bins[i])
+        ]
+
+        mean.append(data_i["eps"].mean())
+        iqr.append(data_i["eps"].quantile(0.75) - data_i["eps"].quantile(0.25))
+
+    ax[1].plot(bins[:-1], iqr[:])
+    ax[1].set_xlabel(r"$|\epsilon|$")
+    ax[1].set_ylabel(r"IQR")
+
+    ax12 = ax[1].twinx()
+    ax12.plot(bins[:-1], mean[:], color="#ff7f0e")
+    ax12.set_ylabel(r"$\bar{\Delta\sigma}$")
+
+    plt.tight_layout()
+    plt.savefig("../5_Writing/chapters/5_uq_cost/image/unc_propagation.png")
+    plt.close()
+
+
+def plot_pure_uncertainty():
+    data = dataset.build_grouped_dataset()
+    plt.scatter(data["N"], data["Z"], c=data["prediction_std"])
+
+    plt.tight_layout()
+    plt.savefig("../5_Writing/chapters/5_uq_cost/image/unc_pure.png")
+    plt.close()
