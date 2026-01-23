@@ -92,6 +92,31 @@ def plot_loss_convergence(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_robustness_samebase(path: str) -> None:
+    """Plot the robustness test of the model with the same base configuration. Left plot shows the impact of additional neuron, while right plot shows the impact of dropout architecture
+
+    Args:
+        path (str): path to save the figure
+    """
+
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+
+    # Load data
+    data_neuron_addition = pd.read_csv("summary.csv", sep=",").iloc[44:50, :]
+    data_neuron_drop = pd.read_csv("summary.csv", sep=",").iloc[26:33, :]
+
+    ax[0].scatter(
+        data_neuron_addition["note"].astype(int), data_neuron_addition["rms_dev"]
+    )
+    ax[0].set_ylabel("RMS Deviation (MeV)")
+    ax[0].set_xlabel("Number of additional layer(s)")
+
+    ax[1].scatter(data_neuron_drop["note"].astype(float), data_neuron_drop["rms_dev"])
+    ax[1].set_xlabel("Dropout rate (\\%)")
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_nz() -> None:
     data = dataset.build_gap_dataset()
     print(data)

@@ -20,8 +20,11 @@ plt.rcParams.update(
 # analysis.plot_report.plot_me_bsk_comparison(
 #     "../5_Writing/chapters/1_introduction/image/deviation.pdf"
 # )
-analysis.plot_report.plot_loss_convergence(
-    "../5_Writing/chapters/3_hyperparam_tuning/image/loss_convergence.pdf"
+# analysis.plot_report.plot_loss_convergence(
+#     "../5_Writing/chapters/3_hyperparam_tuning/image/loss_convergence.pdf"
+# )
+analysis.plot_report.plot_robustness_samebase(
+    "../master-thesis/chapters/3_hyperparam_tuning/image/robustness_samebase.pdf"
 )
 # analysis.plot_report.plot_gap_n_asymmetry()
 # analysis.plot_report.plot_sigma_propagation()
