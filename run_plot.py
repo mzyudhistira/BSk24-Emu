@@ -26,6 +26,7 @@ plt.rcParams.update(
 analysis.plot_report.plot_robustness_samebase(
     "../master-thesis/chapters/3_hyperparam_tuning/image/robustness_samebase.pdf"
 )
-# analysis.plot_report.plot_gap_n_asymmetry()
-# analysis.plot_report.plot_sigma_propagation()
-# analysis.plot_report.plot_pure_uncertainty()
+
+analysis.plot_report.plot_robustness_diffbase(
+    "../master-thesis/chapters/3_hyperparam_tuning/image/robustness_diffbase.pdf"
+)

@@ -99,22 +99,57 @@ def plot_robustness_samebase(path: str) -> None:
         path (str): path to save the figure
     """
 
-    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 7)))
 
     # Load data
-    data_neuron_addition = pd.read_csv("summary.csv", sep=",").iloc[44:50, :]
-    data_neuron_drop = pd.read_csv("summary.csv", sep=",").iloc[26:33, :]
+    data_neuron_addition = pd.read_csv("summary.csv", sep=",").iloc[42:48, :]
+    data_neuron_drop = pd.read_csv("summary.csv", sep=",").iloc[24:30, :]
 
     ax[0].scatter(
         data_neuron_addition["note"].astype(int), data_neuron_addition["rms_dev"]
     )
     ax[0].set_ylabel("RMS Deviation (MeV)")
     ax[0].set_xlabel("Number of additional layer(s)")
+    ax[0].set_ylim(0, 1.75)
+    ax[0].set_xticks(np.arange(0, 6))
 
-    ax[1].scatter(data_neuron_drop["note"].astype(float), data_neuron_drop["rms_dev"])
+    ax[1].scatter(
+        data_neuron_drop["note"].astype(float) * 100, data_neuron_drop["rms_dev"]
+    )
     ax[1].set_xlabel("Dropout rate (\\%)")
+    ax[1].set_ylim(0)
+    ax[1].set_xticks(np.arange(20, 90, 20))
 
-    plot_utils.savefig(fig, ax, path)
+    fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_robustness_diffbase(path: str) -> None:
+    """Plot the robustness test of the model with different base configuration. Left plot shows inverse sequential architecture, while right plot shows bottleneck architecture.
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 7)))
+
+    # Load data
+    data_inverse_sequential = pd.read_csv("summary.csv", sep=",").iloc[7:17]
+    data_bottleneck = pd.read_csv("summary.csv", sep=",").iloc[17:24]
+
+    # Plot inverse sequential result
+    ax[0].scatter(np.arange(1, 11), data_inverse_sequential["rms_dev"])
+    ax[0].set_ylabel("RMS Deviation (MeV)")
+    ax[0].set_xticks(np.arange(1, 11, 2))
+    ax[0].set_ylim(bottom=0, top=0.8)
+
+    # Plot bottleneck result
+    ax[1].scatter(np.arange(1, 8), data_bottleneck["rms_dev"])
+    ax[1].set_xticks(np.arange(1, 8, 2))
+    ax[1].set_ylim(bottom=0, top=1.25)
+
+    fig.supxlabel("Multiplication Factor")
+    fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_gap_nz() -> None:
