@@ -152,6 +152,38 @@ def plot_robustness_diffbase(path: str) -> None:
     plt.close(fig)
 
 
+def plot_stability_one(path: str) -> None:
+    """Plot the stability test of the ML model on several variants
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(
+        1,
+        3,
+        figsize=plot_utils.latex_figure(ratio=(18, 7)),
+        sharey=True,
+    )
+
+    # Load data
+    stability_data: pd.DataFrame = pd.read_csv("summary.csv", sep=",").iloc[137:-2]
+
+    variant_test: list[int] = [1, 13, 1420]
+
+    for i in range(3):
+        v_test: pd.DataFrame = stability_data[
+            stability_data["run_name"].str.startswith(f"Variant_{variant_test[i]}_")
+        ]
+        rms_dev: pd.Series = v_test["rms_dev"]
+
+        ax[i].hist(rms_dev)
+        ax[i].set_title(f"Variant {variant_test[i]}")
+
+    fig.supylabel("Frequency")
+    fig.supxlabel("RMS Deviation (MeV)")
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_nz() -> None:
     data = dataset.build_gap_dataset()
     print(data)
