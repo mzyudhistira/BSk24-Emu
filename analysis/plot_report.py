@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import spearmanr
+from scipy.stats import pearsonr, spearmanr
 
 from . import plot_utils
 
@@ -58,6 +58,31 @@ def plot_me_bsk_comparison(path: str) -> None:
     ax.set_xlabel("N")
     ax.set_ylabel(r"$m - m_{\mathrm{BSk32}}\;(\mathrm{MeV})$")
     ax.legend()
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_correlation_illustration(path: str) -> None:
+    """Plot an illustration of Pearson and Spearman correlation coefficient, where Spearmann~1 and Pearson ~0
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
+
+    x = np.linspace(0.01, 0.99, 250)
+    y = 0.5 + 0.1 * np.tan(np.pi * (x + 0.5)) + 5e-2 * np.random.randn(len(x))
+
+    # correlations
+    r_pearson = pearsonr(x, y)[0]
+    r_spearman = spearmanr(x, y)[0]
+
+    print(f"Pearson r  = {r_pearson:.3f}")
+    print(f"Spearman ρ = {r_spearman:.3f}")
+
+    ax.scatter(x, y, s=4)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
 
     plot_utils.savefig(fig, ax, path)
 

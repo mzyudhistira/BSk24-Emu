@@ -17,6 +17,10 @@ plt.rcParams.update(
     }
 )
 
+analysis.plot_report.plot_correlation_illustration(
+    "../master-thesis/chapters/2_theory/image/correlation_illustration.pdf"
+)
+
 # analysis.plot_report.plot_me_bsk_comparison(
 #     "../5_Writing/chapters/1_introduction/image/deviation.pdf"
 # )
