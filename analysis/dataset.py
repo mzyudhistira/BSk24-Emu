@@ -4,6 +4,26 @@ import pandas as pd
 from input.load import load_df
 
 
+def opt_data_test() -> pd.DataFrame:
+    """Load dataset of optimum training test
+
+    Returns:
+        dataset (pd.DataFrame): Summary of the dataset
+    """
+    dataset: pd.DataFrame = pd.read_csv("data/summary/optimum_data_test.csv")
+
+    # Extract parameter
+    dataset["variant_id"] = [
+        var_str.split("_")[1] for var_str in dataset["run_name"].values
+    ]
+    dataset["percent_train_data"] = [
+        round(float(var_str.split("_")[2]), 2) * 80
+        for var_str in dataset["run_name"].values
+    ]
+
+    return dataset
+
+
 def relative_skyrme(result_row):
     """
     Calculate the relative skyrme parameter wrt BSk24.
@@ -19,7 +39,7 @@ def relative_skyrme(result_row):
     normalized_skyrme = []
 
     for i in range(21):
-        normalized_val = result_row[f"param({i+1:02d})"] - bsk_param.iloc[0, i]
+        normalized_val = result_row[f"param({i + 1:02d})"] - bsk_param.iloc[0, i]
 
         normalized_skyrme.append(normalized_val)
 

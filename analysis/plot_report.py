@@ -8,6 +8,7 @@ import seaborn as sns
 from scipy.stats import pearsonr, spearmanr
 
 from . import plot_utils
+from . import dataset
 
 
 def plot_me_bsk_comparison(path: str) -> None:
@@ -71,7 +72,7 @@ def plot_correlation_illustration(path: str) -> None:
     fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
 
     x = np.linspace(0.01, 0.99, 250)
-    y = 0.5 + 0.1 * np.tan(np.pi * (x + 0.5)) + 5e-2 * np.random.randn(len(x))
+    y = 0.5 + 0.1 * np.tan(np.pi * (x + 0.5)) + 3e-2 * np.random.randn(len(x))
 
     # correlations
     r_pearson = pearsonr(x, y)[0]
@@ -205,6 +206,112 @@ def plot_stability_one(path: str) -> None:
 
     fig.supylabel("Frequency")
     fig.supxlabel("RMS Deviation (MeV)")
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_percent_train(path: str) -> None:
+    """Plot the change of RMSE due to different amount of training data
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
+
+    # Load data
+    opt_data_test = dataset.opt_data_test()
+
+    sns.boxplot(
+        x="percent_train_data",
+        y="rms_dev",
+        data=opt_data_test,
+        fliersize=3,
+        width=0.5,
+        ax=ax,
+    )
+
+    # Adjust ticks to show only half of them
+    ticks = ax.get_xticks()
+    labels: list[str] = [item.get_text()[:4] for item in ax.get_xticklabels()]
+
+    ax.set_xticks(ticks[::2])
+    ax.set_xticklabels(labels[::2])
+
+    ax.set_ylabel("RMS Deviation (MeV)")
+    ax.set_xlabel(r"Train Data (\%)")
+    ax.set_ylim(bottom=0)
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_ic50_analysis(path: str) -> None:
+    """Plot IC50 analysis to determine the minimum amount of training data
+
+    Args:
+        path (str): path to save the figure
+    """
+
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 7)))
+
+    # Groupby
+    compact_df = dataset.opt_data_test()
+    compact_df = compact_df.groupby("percent_train_data", as_index=False).agg(
+        mean=("rms_dev", "mean"),
+        iqr=("rms_dev", lambda x: x.quantile(0.75) - x.quantile(0.25)),
+    )
+
+    # Determine the optimum
+    ax[0].scatter(compact_df["percent_train_data"], compact_df["mean"])
+    ax[0].set_ylabel("RMS Deviation (MeV)")
+
+    ax[1].scatter(compact_df["percent_train_data"], compact_df["iqr"])
+    ax[1].set_ylabel("IQR (MeV)")
+
+    # IC50-like determination
+    def det_ic50(col):
+        val_max = col.max()
+        val_min = col.min()
+
+        half_pos = (val_max - val_min) / 2 + val_min
+        delta = col.apply(lambda x: x - half_pos)
+        lower_than_half = delta[delta < 0]
+        higher_than_half = delta[delta > 0]
+        first_closest_value = [
+            np.abs(lower_than_half.iloc[0]),
+            np.abs(higher_than_half.iloc[-1]),
+        ]
+
+        return delta.index[delta.abs() == min(first_closest_value)]
+
+    ic50_mean = compact_df.loc[det_ic50(compact_df["mean"])][
+        "percent_train_data"
+    ].values[0]
+
+    ic50_iqr = compact_df.loc[det_ic50(compact_df["iqr"])]["percent_train_data"].values[
+        0
+    ]
+    mean_thresh = compact_df[compact_df["percent_train_data"] == ic50_mean][
+        "mean"
+    ].values[0]
+    iqr_thresh = compact_df[compact_df["percent_train_data"] == ic50_iqr]["iqr"].values[
+        0
+    ]
+
+    ax[0].plot(
+        np.linspace(0, 100, 100),
+        mean_thresh * np.ones(100),
+        color="red",
+    )
+    ax[1].plot(
+        np.linspace(0, 100, 100),
+        iqr_thresh * np.ones(100),
+        color="red",
+    )
+
+    print(f"Mean: {ic50_mean}")
+    print(f"IQR: {ic50_iqr}")
+
+    fig.supxlabel(r"Training Data (\%)")
 
     plot_utils.savefig(fig, ax, path)
 

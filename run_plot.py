@@ -38,3 +38,11 @@ analysis.plot_report.plot_robustness_diffbase(
 analysis.plot_report.plot_stability_one(
     "../master-thesis/chapters/3_hyperparam_tuning/image/stability_one.pdf"
 )
+
+analysis.plot_report.plot_percent_train(
+    "../master-thesis/chapters/3_hyperparam_tuning/image/percent_train.pdf"
+)
+
+analysis.plot_report.plot_ic50_analysis(
+    "../master-thesis/chapters/3_hyperparam_tuning/image/ic50_analysis.pdf"
+)
