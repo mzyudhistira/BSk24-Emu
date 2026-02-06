@@ -1,5 +1,4 @@
 from pathlib import Path
-from math import sqrt
 
 import numpy as np
 import pandas as pd
@@ -316,9 +315,26 @@ def plot_ic50_analysis(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
-def plot_gap_nz() -> None:
-    data = dataset.build_gap_dataset()
-    print(data)
+def plot_rmse_dist(path: str) -> None:
+    """Plot the RMSE distribution of full scale simulation on 24% dataset
+
+    Args:
+        path (str): path to save the figure
+    """
+
+    fig, ax = plt.subplots(
+        1, 1, figsize=plot_utils.latex_figure(fraction=0.8, ratio=(3, 2))
+    )
+
+    # Load dataset
+    dataset = pd.read_csv("data/summary/full_scale.csv")
+
+    ax.hist(dataset["rms_dev"])
+    ax.set_yticks(np.arange(0, 9000, 2000))
+    ax.set_xlabel(r"$\text{RMSE}_\text{v, ML}$")
+    ax.set_ylabel("Frequency")
+
+    plot_utils.savefig(fig, ax, path)
 
 
 def plot_gap_n_asymmetry():
