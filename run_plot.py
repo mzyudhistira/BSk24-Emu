@@ -51,3 +51,7 @@ analysis.plot_report.plot_ic50_analysis(
 analysis.plot_report.plot_rmse_dist(
     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
 )
+
+analysis.plot_report.plot_moment_correlation(
+    "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+)

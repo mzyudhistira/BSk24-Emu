@@ -24,6 +24,38 @@ def opt_data_test() -> pd.DataFrame:
     return dataset
 
 
+def extract_variant_moment(variant_mt) -> pd.Series:
+    """Calculate the dataset moment of each variant
+    Args:
+        variant_mt (pd.DataFrame): DataFrame of a variant to be analysed.
+
+    Returns:
+        moment_df (pd.Series): Series of variant's moments, including some comparative quantities.
+    """
+    target = variant_mt["target"]
+    prediction = variant_mt["prediction"]
+
+    rms_dev = rms(target - prediction)
+
+    moment_df = pd.Series(
+        {
+            "rms_dev": rms_dev,
+            "drms": rms(target) - rms(prediction),
+            "r_std": prediction.std() / target.std(),
+            "variant_rms": rms(target),
+            "variant_mean": target.mean(),
+            "variant_std": target.std(),
+            "variant_skew": target.skew(),
+            "ml_rms": rms(prediction),
+            "ml_mean": prediction.mean(),
+            "ml_std": prediction.std(),
+            "ml_skew": prediction.skew(),
+        }
+    )
+
+    return moment_df
+
+
 def relative_skyrme(result_row):
     """
     Calculate the relative skyrme parameter wrt BSk24.

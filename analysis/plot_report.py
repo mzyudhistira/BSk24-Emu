@@ -327,14 +327,89 @@ def plot_rmse_dist(path: str) -> None:
     )
 
     # Load dataset
-    dataset = pd.read_csv("data/summary/full_scale.csv")
+    data: pd.DataFrame = pd.read_csv("data/summary/full_scale.csv")
 
-    ax.hist(dataset["rms_dev"])
+    ax.hist(data["rms_dev"])
     ax.set_yticks(np.arange(0, 9000, 2000))
     ax.set_xlabel(r"$\text{RMSE}_\text{v, ML}$")
     ax.set_ylabel("Frequency")
 
     plot_utils.savefig(fig, ax, path)
+
+
+def plot_moment_correlation(path: str) -> None:
+    """Plot correlation of variant's and ML's moments
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(
+        1, 1, figsize=plot_utils.latex_figure(ratio=(4, 3), fraction=0.8)
+    )
+
+    # Load the dataset
+    full_result = pd.read_parquet("data/result/full_mass_table.parquet")
+    moment_df = (
+        full_result.groupby(["variant_id"])
+        .apply(dataset.extract_variant_moment)
+        .reset_index()
+    )
+    del full_result
+
+    # Correlation test
+    target_columns = ["variant_rms", "variant_mean", "variant_std", "variant_skew"]
+    result_columns = [
+        "rms_dev",
+        "r_std",
+        "drms",
+        "ml_rms",
+        "ml_mean",
+        "ml_std",
+        "ml_skew",
+    ]
+
+    corr_matrix = pd.DataFrame(
+        index=target_columns, columns=result_columns, dtype=float
+    )
+
+    for index in target_columns:
+        for column in result_columns:
+            corr = moment_df[[index, column]].corr(method="spearman").iloc[0, 1]
+            corr_matrix.loc[index, column] = round(corr, 3)
+
+    ticks = [-1, -0.5, 0, 0.5, 1]
+
+    # Make coloured figure
+    ax = sns.heatmap(
+        corr_matrix,
+        cmap="coolwarm",
+        center=0,
+        vmin=-1,
+        vmax=1,
+        cbar_kws={"ticks": ticks},
+    )
+
+    ax.collections[0].colorbar.set_ticklabels(ticks)
+
+    ax.set_xticklabels(
+        [
+            r"RMSE$_\text{v,ML}$",
+            r"$r_\sigma$",
+            r"$\Delta$RMS",
+            r"$\mu_\text{RMS}^\text{ML}$",
+            r"$\mu^\text{ML}$",
+            r"$\sigma^\text{ML}$",
+            r"$\gamma^\text{ML}$",
+        ],
+        rotation=30,
+        ha="right",
+    )
+    ax.set_yticklabels(
+        [r"$\mu_\text{RMS}^v$", r"$\mu^v$", r"$\sigma^v$", r"$\gamma^v$"], rotation=0
+    )
+
+    fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_gap_n_asymmetry():
