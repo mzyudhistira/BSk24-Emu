@@ -412,6 +412,90 @@ def plot_moment_correlation(path: str) -> None:
     plt.close(fig)
 
 
+def plot_delta_mu(path) -> None:
+    """Plot the Delta mu_v,ML across the nuclear chart
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
+
+    # Load data
+    data: pd.DataFrame = pd.read_parquet("data/result/full_mass_table.parquet")
+    aggregated_data: pd.DataFrame = (
+        data.groupby(by=["Z", "N"])
+        .agg(
+            target_mean=("target", "mean"),
+            target_std=("target", "std"),
+            prediction_mean=("prediction", "mean"),
+            prediction_std=("prediction", "std"),
+        )
+        .reset_index()
+    )
+    del data
+
+    aggregated_data["dmu"] = (
+        aggregated_data["prediction_mean"] - aggregated_data["target_mean"]
+    )
+
+    dmu_plot = ax.scatter(
+        aggregated_data["N"],
+        aggregated_data["Z"],
+        c=aggregated_data["dmu"],
+        s=0.5,
+        cmap="coolwarm",
+        vmin=-2.5,
+        vmax=2.5,
+    )
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+    plt.colorbar(dmu_plot, ax=ax, label=r"$\Delta \bar{\mu}_\text{v,ML}$")
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_rstd(path) -> None:
+    """Plot the Delta r_sigma across the nuclear chart
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
+
+    # Load data
+    data: pd.DataFrame = pd.read_parquet("data/result/full_mass_table.parquet")
+    aggregated_data: pd.DataFrame = (
+        data.groupby(by=["Z", "N"])
+        .agg(
+            target_mean=("target", "mean"),
+            target_std=("target", "std"),
+            prediction_mean=("prediction", "mean"),
+            prediction_std=("prediction", "std"),
+        )
+        .reset_index()
+    )
+    del data
+
+    aggregated_data["rsigma"] = (
+        aggregated_data["prediction_std"] / aggregated_data["target_std"]
+    )
+
+    rsigma_plot = ax.scatter(
+        aggregated_data["N"],
+        aggregated_data["Z"],
+        c=aggregated_data["rsigma"],
+        s=0.5,
+        cmap="coolwarm",
+        vmin=0,
+        vmax=2,
+    )
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+    plt.colorbar(rsigma_plot, ax=ax, label=r"$r_\sigma$")
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()

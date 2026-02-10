@@ -55,3 +55,11 @@ analysis.plot_report.plot_rmse_dist(
 analysis.plot_report.plot_moment_correlation(
     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
 )
+
+analysis.plot_report.plot_delta_mu(
+    "../master-thesis/chapters/4_full_scale/image/fullscale_dmu.pdf"
+)
+
+analysis.plot_report.plot_rstd(
+    "../master-thesis/chapters/4_full_scale/image/fullscale_rsigma.pdf"
+)
