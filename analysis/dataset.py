@@ -56,6 +56,68 @@ def extract_variant_moment(variant_mt) -> pd.Series:
     return moment_df
 
 
+def epsilon_sigma_dataset() -> pd.DataFrame:
+    """Load sigma and epsilon values of nuclei.
+
+    returns:
+        grouped (pd.DataFrame) : Dataset
+    """
+
+    dataset = pd.read_parquet("data/result/full_mass_table.parquet")
+
+    grouped = (
+        dataset.groupby(["Z", "N"])
+        .agg(
+            target_mean=("target", "mean"),
+            target_std=("target", "std"),
+            prediction_mean=("prediction", "mean"),
+            prediction_std=("prediction", "std"),
+        )
+        .reset_index()
+    )
+
+    def categorize(values, labels):
+        bins = [0, 1, 2, 3, float("inf")]
+        return pd.cut(values, bins=bins, labels=labels, right=True)
+
+    raw_epsilon = (
+        np.abs(grouped["prediction_mean"] - grouped["target_mean"])
+        / grouped["target_std"]
+    )
+
+    grouped["epsilon"] = categorize(
+        raw_epsilon,
+        [
+            r"$\epsilon \leq 1$ MeV",
+            r"$1 < \epsilon \leq 2$ MeV",
+            r"$2 < \epsilon \leq 3$ MeV",
+            r"$\epsilon \geq 4$ MeV",
+        ],
+    )
+
+    grouped["sigma"] = categorize(
+        grouped["prediction_std"],
+        [
+            r"$\sigma \leq 1$ MeV",
+            r"$1 < \sigma \leq 2$ MeV",
+            r"$2 < \sigma \leq 3$ MeV",
+            r"$\sigma \geq 4$ MeV",
+        ],
+    )
+
+    grouped["sigma_t"] = categorize(
+        grouped["target_std"],
+        [
+            r"$\sigma \leq 1$ MeV",
+            r"$1 < \sigma \leq 2$ MeV",
+            r"$2 < \sigma \leq 3$ MeV",
+            r"$\sigma \geq 4$ MeV",
+        ],
+    )
+
+    return grouped
+
+
 def relative_skyrme(result_row):
     """
     Calculate the relative skyrme parameter wrt BSk24.

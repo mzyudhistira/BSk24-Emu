@@ -496,6 +496,48 @@ def plot_rstd(path) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_epsilon(path) -> None:
+    """Plot the epsilon across the nuclear chart
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
+
+    # Load Data
+    data = dataset.epsilon_sigma_dataset()
+
+    colour_map = {
+        r"$\epsilon \leq 1$ MeV": "#FBD900",
+        r"$1 < \epsilon \leq 2$ MeV": "#00AAF0",
+        r"$2 < \epsilon \leq 3$ MeV": "#098000",
+        r"$\epsilon \geq 4$ MeV": "#FF1503",
+    }
+
+    hue_order = [
+        r"$\epsilon \leq 1$ MeV",
+        r"$1 < \epsilon \leq 2$ MeV",
+        r"$2 < \epsilon \leq 3$ MeV",
+        r"$\epsilon \geq 4$ MeV",
+    ]
+    sns.scatterplot(
+        data=data,
+        x="N",
+        y="Z",
+        hue="epsilon",
+        palette=colour_map,
+        s=1.8,
+        hue_order=hue_order,
+        edgecolor="none",
+    )
+
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+    ax.legend(title="", loc="lower right", markerscale=3)
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()
