@@ -56,14 +56,19 @@ def extract_variant_moment(variant_mt) -> pd.Series:
     return moment_df
 
 
-def epsilon_sigma_dataset() -> pd.DataFrame:
+def epsilon_sigma_dataset(train_data="full") -> pd.DataFrame:
     """Load sigma and epsilon values of nuclei.
+    Args:
+        train_data (str): The ML dataset to plot, train with certain percentage of input data. Possible options are 025, 05, 1, 2, 4, 8, and full (24). Default to full.
 
     returns:
         grouped (pd.DataFrame) : Dataset
     """
 
-    dataset = pd.read_parquet("data/result/full_mass_table.parquet")
+    if train_data == "full":
+        dataset = pd.read_parquet("data/result/full_mass_table.parquet")
+    else:
+        dataset = pd.read_parquet(f"data/result/full_mass_table_{train_data}.parquet")
 
     grouped = (
         dataset.groupby(["Z", "N"])

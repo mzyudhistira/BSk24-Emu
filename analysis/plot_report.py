@@ -538,6 +538,59 @@ def plot_epsilon(path) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_uncertainty(
+    path: str, train_data: str = "full", variant: bool = False
+) -> None:
+    """Plot the uncertainty of ML dataset
+    Args:
+        path (str): Path to save the figure
+        train_data (str): The ML dataset to plot, train with certain percentage of input data. Possible options are 025, 05, 1, 2, 4, 8, and full (24). Default to full.
+        variant (bool): Determine the data to plot.
+            True: variant dataset
+            False: ML dataset
+    """
+
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
+    # Load data
+    data = dataset.epsilon_sigma_dataset(train_data=train_data)
+
+    colour_map = {
+        r"$\sigma \leq 1$ MeV": "#FBD900",
+        r"$1 < \sigma \leq 2$ MeV": "#00AAF0",
+        r"$2 < \sigma \leq 3$ MeV": "#098000",
+        r"$\sigma \geq 4$ MeV": "#FF1503",
+    }
+
+    hue_order = [
+        r"$\sigma \leq 1$ MeV",
+        r"$1 < \sigma \leq 2$ MeV",
+        r"$2 < \sigma \leq 3$ MeV",
+        r"$\sigma \geq 4$ MeV",
+    ]
+
+    if variant == True:
+        hue_data = "sigma_t"
+    else:
+        hue_data = "sigma"
+
+    sns.scatterplot(
+        data=data,
+        x="N",
+        y="Z",
+        hue=hue_data,
+        palette=colour_map,
+        s=1.8,
+        hue_order=hue_order,
+        edgecolor="none",
+    )
+
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+    ax.legend(title="", loc="lower right", markerscale=3)
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()

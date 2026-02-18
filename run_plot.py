@@ -64,6 +64,20 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/fullscale_rsigma.pdf"
 # )
 
-analysis.plot_report.plot_epsilon(
-    "../master-thesis/chapters/4_full_scale/image/fullscale_epsilon.pdf"
+# analysis.plot_report.plot_epsilon(
+#     "../master-thesis/chapters/4_full_scale/image/fullscale_epsilon.pdf"
+# )
+
+analysis.plot_report.plot_uncertainty(
+    "../master-thesis/chapters/5_uq_cost/image/unc_full.pdf"
 )
+analysis.plot_report.plot_uncertainty(
+    "../master-thesis/chapters/5_uq_cost/image/unc_full_variant.pdf",
+    variant=True,
+)
+
+for train_data in ["025", "05", "1", "2", "4", "8"]:
+    analysis.plot_report.plot_uncertainty(
+        f"../master-thesis/chapters/5_uq_cost/image/unc_{train_data}.pdf",
+        train_data=train_data,
+    )
