@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -121,6 +123,41 @@ def epsilon_sigma_dataset(train_data="full") -> pd.DataFrame:
     )
 
     return grouped
+
+
+def extract_moment_old_dataset() -> pd.DataFrame:
+    """Extract the moment and relevant properties of the previous ML model, where variants parameters were incorporated
+
+    Returns:
+        data (pd.DataFrame) : Old dataset
+
+    """
+    data_dir: Path = Path("data/old")
+
+    files: list[Path] = [
+        f for f in data_dir.iterdir() if f.is_file() and f.suffix == ".csv"
+    ]
+
+    data_list = []
+    for file in files[:]:
+        run_data: pd.DataFrame = pd.read_csv(file, sep=";")
+
+        run_properties = {}
+        run_properties["dataset_type"] = str(file).split("/")[-1].split("_")[0]
+        run_properties["var_train"] = str(file).split("/")[-1].split("_")[1]
+        run_properties["var_predict"] = (
+            str(file).split("/")[-1].split("_")[2].split(".")[0]
+        )
+        run_properties["rms_dev"] = rms(run_data["Difference"])
+        run_properties["avg_diff"] = run_data["Difference"].mean()
+        run_properties["std_diff"] = run_data["Difference"].mean()
+
+        data_list.append(run_properties)
+
+    data = pd.DataFrame(data_list)
+    data.to_csv("data/result/old_run.csv", index=False)
+
+    return data
 
 
 def relative_skyrme(result_row):

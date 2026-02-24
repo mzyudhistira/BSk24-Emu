@@ -591,6 +591,41 @@ def plot_uncertainty(
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_old_data(path_exp, path_ext) -> None:
+    """Plot the RMS Dev vs Number of Variants figure of the ML model incorporating variants' parameters. EXP refers to ML model predicting experimental masses, while EXT referes to ML model predicting extrapolated masses.
+
+    Args:
+        path_exp (str): path to save the EXP figure
+        path_ext (str): path to save the EXT figure
+    """
+
+    data = pd.read_csv("data/result/old_run.csv")
+
+    for data_type, ratio, save_path in [
+        ["EXP", [1, 3, 4], path_exp],
+        ["EXT", [1, 2, 4], path_ext],
+    ]:
+        fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
+
+        for i in ratio:
+            filtered_data = data[
+                (data["dataset_type"] == data_type)
+                & (data["var_predict"] / data["var_train"] == i)
+            ]
+
+            ax.scatter(
+                filtered_data["var_train"], filtered_data["rms_dev"], label=f"{i}:{i}"
+            )
+
+        ax.set_xlabel("Variants")
+        ax.set_ylabel("RMS Deviation (MeV)")
+        ax.set_ylim(bottom=0)
+
+        ax.legend()
+
+        plot_utils.savefig(fig, ax, save_path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()
