@@ -614,7 +614,7 @@ def plot_old_data(path_exp, path_ext) -> None:
             ]
 
             ax.scatter(
-                filtered_data["var_train"], filtered_data["rms_dev"], label=f"{i}:{i}"
+                filtered_data["var_train"], filtered_data["rms_dev"], label=f"1:{i}"
             )
 
         ax.set_xlabel("Variants")
@@ -624,6 +624,46 @@ def plot_old_data(path_exp, path_ext) -> None:
         ax.legend()
 
         plot_utils.savefig(fig, ax, save_path)
+
+
+def plot_eps_dist_weight(path) -> None:
+    """Plot the epsilon distribution of light and heavy nuclei
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+
+    grouped = pd.read_parquet("data/result/full_mt_grouped.parquet")
+    grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
+        "target_std"
+    ]
+    grouped["A"] = grouped["Z"] + grouped["N"]
+
+    heavy_nuclei = grouped[grouped["A"] > 50]["diff"]
+    light_nuclei = grouped[grouped["A"] <= 50]["diff"]
+    # Plot each histogram on a different subplot
+    sns.histplot(heavy_nuclei, stat="percent", ax=ax[0])
+    ax[0].set_title("Heavy Nuclei")
+    ax[0].set_xlabel("")
+
+    sns.histplot(light_nuclei, stat="percent", ax=ax[1])
+    ax[1].set_title("Light Nuclei")
+    ax[1].set_ylabel("")
+    ax[1].set_xlabel("")
+
+    fig.supxlabel(r"$\epsilon$")
+
+    print(f"Percentage Heavy: {heavy_nuclei.shape[0] / grouped.shape[0] * 100:.2f}")
+    print(f"Percentage Light: {light_nuclei.shape[0] / grouped.shape[0] * 100:.2f}")
+    print(
+        f"IQR_Heavy Nuclei: {heavy_nuclei.quantile(0.75) - heavy_nuclei.quantile(0.25):.3f}"
+    )
+    print(
+        f"IQR_Light Nuclei: {light_nuclei.quantile(0.75) - light_nuclei.quantile(0.25):.3f}"
+    )
+
+    plot_utils.savefig(fig, ax, path)
 
 
 def plot_gap_n_asymmetry():
