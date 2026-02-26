@@ -666,6 +666,61 @@ def plot_eps_dist_weight(path) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_eps_dist_magic(path: str) -> None:
+    """Plot the epsilon distribution of magic and tradtional magic nuclei
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+
+    grouped = pd.read_parquet("data/result/full_mt_grouped.parquet")
+    grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
+        "target_std"
+    ]
+    grouped["A"] = grouped["Z"] + grouped["N"]
+
+    magic_N = [2, 8, 14, 20, 28, 40, 50, 82, 126, 184]
+    magic_Z = [2, 8, 20, 28, 50, 82, 126]
+
+    traditional_magic_Z = [2, 8, 20, 28, 50, 82]
+    traditional_magic_N = [2, 8, 20, 28, 50, 82, 126]
+
+    magic_nuclei = grouped[(grouped["N"].isin(magic_N)) | (grouped["Z"].isin(magic_Z))][
+        "diff"
+    ]
+    traditional_magic_nuclei = grouped[
+        (grouped["N"].isin(traditional_magic_N))
+        | (grouped["Z"].isin(traditional_magic_Z))
+    ]["diff"]
+
+    print(f"Percentage Magic: {magic_nuclei.shape[0] / grouped.shape[0] * 100:.2f}")
+    print(
+        f"Percentage Traditional Magic: {traditional_magic_nuclei.shape[0] / grouped.shape[0] * 100:.2f}"
+    )
+
+    # Plot each histogram on a different subplot
+    sns.histplot(magic_nuclei, stat="percent", ax=ax[0])
+    ax[0].set_title("Magic Nuclei")
+    ax[0].set_xlabel("")
+
+    sns.histplot(traditional_magic_nuclei, stat="percent", ax=ax[1])
+    ax[1].set_title("Traditional Magic Nuclei")
+    ax[1].set_ylabel("")
+    ax[1].set_xlabel("")
+
+    fig.supxlabel(r"$\epsilon$")
+
+    print(
+        f"IQR_Magic Nuclei: {magic_nuclei.quantile(0.75) - magic_nuclei.quantile(0.25):.3f}"
+    )
+    print(
+        f"IQR_Traditional Magic Nuclei: {traditional_magic_nuclei.quantile(0.75) - traditional_magic_nuclei.quantile(0.25):.3f}"
+    )
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()

@@ -82,6 +82,8 @@ plt.rcParams.update(
 #         train_data=train_data,
 #     )
 #
-analysis.plot_report.plot_old_data("test.pdf", "test2.pdf")
+# analysis.plot_report.plot_old_data("test.pdf", "test2.pdf")
+#
+# analysis.plot_report.plot_eps_dist_weight("eps_weight.pdf")
 
-analysis.plot_report.plot_eps_dist_weight("eps_weight.pdf")
+analysis.plot_report.plot_eps_dist_magic("eps_magic.pdf")
