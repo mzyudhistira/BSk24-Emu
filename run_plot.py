@@ -81,9 +81,16 @@ plt.rcParams.update(
 #         f"../master-thesis/chapters/5_uq_cost/image/unc_{train_data}.pdf",
 #         train_data=train_data,
 #     )
-#
-# analysis.plot_report.plot_old_data("test.pdf", "test2.pdf")
-#
-# analysis.plot_report.plot_eps_dist_weight("eps_weight.pdf")
 
-analysis.plot_report.plot_eps_dist_magic("eps_magic.pdf")
+analysis.plot_report.plot_old_data(
+    "../master-thesis/chapters/appendix/image/RMSE_vs_variants_EXP.pdf",
+    "../master-thesis/chapters/appendix/image/RMSE_vs_variants_EXT.pdf",
+)
+
+analysis.plot_report.plot_eps_dist_weight(
+    "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
+)
+
+analysis.plot_report.plot_eps_dist_magic(
+    "../master-thesis/chapters/4_full_scale/image/eps_magic.pdf"
+)
