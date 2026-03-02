@@ -91,10 +91,14 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
 # )
 #
-analysis.plot_report.plot_eps_dist_magic(
-    "../master-thesis/chapters/4_full_scale/image/eps_magic.pdf"
-)
+# analysis.plot_report.plot_eps_dist_magic(
+#     "../master-thesis/chapters/4_full_scale/image/eps_magic.pdf"
+# )
+#
+# analysis.plot_report.plot_eps_dist_magic_distance(
+#     "../master-thesis/chapters/4_full_scale/image/eps_magic_dist.pdf"
+# )
 
-analysis.plot_report.plot_eps_dist_magic_distance(
-    "../master-thesis/chapters/4_full_scale/image/eps_magic_dist.pdf"
+analysis.plot_report.plot_param_correlation(
+    "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
 )

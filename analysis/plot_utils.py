@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator, LogLocator
 
 
-def latex_figure(fraction=1.0, ratio=(np.sqrt(5) - 1, 2)):
+def latex_figure(fraction=1.0, ratio=(2, np.sqrt(5) - 1)):
     """Initialize figure size to suit the latex document
 
     Args:

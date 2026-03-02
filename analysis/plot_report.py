@@ -753,6 +753,103 @@ def plot_eps_dist_magic_distance(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_param_correlation(path: str) -> None:
+    """Plot the correlation of parameters with some quantities.
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+
+    moment_df = pd.read_parquet("data/result/sorted_variants_rms.parquet")
+    variant_id = pd.read_parquet("data/input/bsk24_variants_ext.parquet")
+
+    skyrme_param = pd.concat(
+        [variant_id["varian_id"], variant_id.iloc[:, 2:23]], axis=1
+    )
+    skyrme_param.rename(columns={"varian_id": "variant_id"}, inplace=True)
+
+    # Set x_2 to t_2.x_2
+    skyrme_param["param(09)"] = skyrme_param["param(09)"] * skyrme_param["param(03)"]
+
+    # Set param to relative param i.e. (param_variant - param_bsk)
+    skyrme_param.iloc[:, 1:] = skyrme_param.apply(
+        dataset.relative_skyrme, axis=1, result_type="expand"
+    )
+
+    moment_n_skyrme = pd.merge(
+        moment_df[["variant_id", "rms_dev", "r_std", "variant_rms", "ml_rms"]],
+        skyrme_param,
+        on="variant_id",
+        how="inner",
+    )
+
+    # Correlation test
+    target_columns = ["rms_dev", "r_std", "variant_rms", "ml_rms"]
+    result_columns = [col for col in moment_n_skyrme.columns if col.startswith("param")]
+
+    corr_matrix = pd.DataFrame(
+        index=target_columns, columns=result_columns, dtype=float
+    )
+
+    for index in target_columns:
+        for column in result_columns:
+            corr = moment_n_skyrme[[index, column]].corr(method="spearman").iloc[0, 1]
+            corr_matrix.loc[index, column] = round(corr, 3)
+
+    # display(corr_matrix)
+
+    column_name = [
+        r"$t_0$",
+        r"$t_1$",
+        r"$t_2$",
+        r"$t_3$",
+        r"$t_4$",
+        r"$t_5$",
+        r"$x_0$",
+        r"$x_1$",
+        r"$t_2 x_2$",
+        r"$x_3$",
+        r"$x_4$",
+        r"$x_5$",
+        r"$\alpha$",
+        r"$\beta$",
+        r"$\gamma$",
+        r"$W_0$",
+        r"$f_n^+$",
+        r"$f_n^-$",
+        r"$f_p^+$",
+        r"$f_p^-$",
+        r"$\epsilon_\Lambda$",
+    ]
+
+    index_name = [
+        r"$\mu^\text{RMSE}$",
+        r"$r_\sigma$",
+        r"$\mu_v^\text{RMS}$",
+        r"$\mu_\text{ML}^\text{RMS}$",
+    ]
+
+    corr_matrix.columns = column_name
+    corr_matrix.index = index_name
+
+    # Reshape the DataFrame from wide → long (for plotting)
+    corr_matrix_long = corr_matrix.reset_index().melt(
+        id_vars="index", var_name="data", value_name="value"
+    )
+    corr_matrix_long = corr_matrix_long.rename(columns={"index": "parameter"})
+
+    sns.barplot(data=corr_matrix_long, x="data", y="value", hue="parameter", ax=ax)
+
+    ax.set_ylabel("Correlation")
+    ax.set_xlabel("")
+    plt.xticks(rotation=45)
+    ax.legend(loc="lower left")
+
+    fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()
