@@ -82,15 +82,19 @@ plt.rcParams.update(
 #         train_data=train_data,
 #     )
 
-analysis.plot_report.plot_old_data(
-    "../master-thesis/chapters/appendix/image/RMSE_vs_variants_EXP.pdf",
-    "../master-thesis/chapters/appendix/image/RMSE_vs_variants_EXT.pdf",
-)
-
-analysis.plot_report.plot_eps_dist_weight(
-    "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
-)
-
+# analysis.plot_report.plot_old_data(
+#     "../master-thesis/chapters/appendix/image/RMSE_vs_variants_EXP.pdf",
+#     "../master-thesis/chapters/appendix/image/RMSE_vs_variants_EXT.pdf",
+# )
+#
+# analysis.plot_report.plot_eps_dist_weight(
+#     "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
+# )
+#
 analysis.plot_report.plot_eps_dist_magic(
     "../master-thesis/chapters/4_full_scale/image/eps_magic.pdf"
+)
+
+analysis.plot_report.plot_eps_dist_magic_distance(
+    "../master-thesis/chapters/4_full_scale/image/eps_magic_dist.pdf"
 )

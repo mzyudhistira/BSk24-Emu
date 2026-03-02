@@ -672,7 +672,9 @@ def plot_eps_dist_magic(path: str) -> None:
     Args:
         path (str): path to save the figure
     """
-    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+    fig, ax = plt.subplots(
+        1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)), sharey=True
+    )
 
     grouped = pd.read_parquet("data/result/full_mt_grouped.parquet")
     grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
@@ -717,6 +719,36 @@ def plot_eps_dist_magic(path: str) -> None:
     print(
         f"IQR_Traditional Magic Nuclei: {traditional_magic_nuclei.quantile(0.75) - traditional_magic_nuclei.quantile(0.25):.3f}"
     )
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_eps_dist_magic_distance(path: str) -> None:
+    """Plot the epsilon distribution of nucleons' distance from magic number, where epsilon > 1
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(
+        1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)), sharey=True
+    )
+
+    # Load data
+    data = pd.read_parquet("data/result/full_mt_grouped.parquet")
+    # data = data []
+    magic_number = [8, 20, 28, 50, 82, 126]
+    data["eps"] = (data["target_mean"] - data["prediction_mean"]) / data["target_std"]
+    data["dist_N"] = abs(data["N"].values[:, None] - magic_number).min(axis=1)
+    data["dist_Z"] = abs(data["Z"].values[:, None] - magic_number).min(axis=1)
+    filtered_data = data[abs(data["eps"]) > 1]
+
+    # Plot
+    sns.histplot(filtered_data["dist_N"], stat="percent", ax=ax[0], binwidth=4)
+    ax[0].set_xlabel(r"$\Delta N_m$")
+
+    sns.histplot(filtered_data["dist_Z"], stat="percent", ax=ax[1], binwidth=1)
+    ax[1].set_xlabel(r"$\Delta Z_m$")
+    ax[1].set_ylabel("")
 
     plot_utils.savefig(fig, ax, path)
 
