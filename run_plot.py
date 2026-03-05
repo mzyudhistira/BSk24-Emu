@@ -99,6 +99,8 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/eps_magic_dist.pdf"
 # )
 
-analysis.plot_report.plot_param_correlation(
-    "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
-)
+# analysis.plot_report.plot_param_correlation(
+#     "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
+# )
+
+analysis.plot_report.plot_pairing_str_diff("test.pdf")

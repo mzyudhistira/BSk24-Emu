@@ -850,6 +850,27 @@ def plot_param_correlation(path: str) -> None:
     plt.close(fig)
 
 
+def plot_pairing_str_diff(path: str) -> None:
+    """Plot the distribution of proton and neutron pairing strength
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+
+    data = pd.read_parquet("data/input/bsk24_variants_ext.parquet")
+    df_n = data["param(18)"] - data["param(17)"]
+    df_p = data["param(20)"] - data["param(19)"]
+
+    sns.histplot(df_n, stat="percent", label="$\Delta f_n$", ax=ax)
+    sns.histplot(df_p, stat="percent", label="$\Delta f_p$", ax=ax)
+
+    ax.set_xlabel("$\Delta f$")
+    plt.legend()
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()
