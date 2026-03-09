@@ -17,13 +17,18 @@ plt.rcParams.update(
     }
 )
 
+# analysis.plot_report.plot_me_bsk_comparison(
+#     "../5_Writing/chapters/1_introduction/image/deviation.pdf"
+# )
+
 # analysis.plot_report.plot_correlation_illustration(
 #     "../master-thesis/chapters/2_theory/image/correlation_illustration.pdf"
 # )
 
-# analysis.plot_report.plot_me_bsk_comparison(
-#     "../5_Writing/chapters/1_introduction/image/deviation.pdf"
-# )
+analysis.plot_report.plot_bsk_res(
+    "../master-thesis/chapters/2_theory/image/bsk_res.pdf"
+)
+
 # analysis.plot_report.plot_loss_convergence(
 #     "../5_Writing/chapters/3_hyperparam_tuning/image/loss_convergence.pdf"
 # )
@@ -103,6 +108,6 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
 # )
 
-analysis.plot_report.plot_pairing_str_diff(
-    "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
-)
+# analysis.plot_report.plot_pairing_str_diff(
+#     "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
+# )

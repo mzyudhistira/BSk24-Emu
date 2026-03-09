@@ -62,6 +62,33 @@ def plot_me_bsk_comparison(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_bsk_res(path: str) -> None:
+    """Plot the mass and INM predictions made by BSk22-26
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(fraction=0.8))
+
+    data = pd.read_csv("data/others/BSk22-26_INM.csv")
+    data = data.iloc[:, [0, 1, 3, 5, 7]].rename(
+        columns={
+            "rms_dev(M)": "$M$",
+            "rms_dev(M_nr)": "$M_{nr}$",
+            "rms_dev(S_n)": "$S_n$",
+            "rms_dev(Q_beta)": "$Q_\\beta$",
+        }
+    )
+    data = pd.melt(data, id_vars="model", var_name="property", value_name="value")
+
+    sns.barplot(data=data, x="property", y="value", hue="model", ax=ax)
+    ax.set_xlabel("")
+    ax.set_ylabel("RMS Deviation (MeV)")
+    plt.legend(ncol=2, loc=4, fontsize="small")
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_correlation_illustration(path: str) -> None:
     """Plot an illustration of Pearson and Spearman correlation coefficient, where Spearmann~1 and Pearson ~0
 
