@@ -103,4 +103,6 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
 # )
 
-analysis.plot_report.plot_pairing_str_diff("test.pdf")
+analysis.plot_report.plot_pairing_str_diff(
+    "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
+)

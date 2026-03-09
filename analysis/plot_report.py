@@ -856,7 +856,7 @@ def plot_pairing_str_diff(path: str) -> None:
     Args:
         path (str): path to save the figure
     """
-    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(fraction=0.7))
 
     data = pd.read_parquet("data/input/bsk24_variants_ext.parquet")
     df_n = data["param(18)"] - data["param(17)"]
