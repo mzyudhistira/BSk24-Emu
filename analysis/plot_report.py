@@ -578,7 +578,7 @@ def plot_uncertainty(
     """
 
     fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
-    # Load data
+
     data = dataset.epsilon_sigma_dataset(train_data=train_data)
 
     colour_map = {
@@ -894,6 +894,49 @@ def plot_pairing_str_diff(path: str) -> None:
 
     ax.set_xlabel("$\Delta f$")
     plt.legend()
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_goriely_uncertainty(path: str) -> None:
+    """Plot the uncertainty of the mass prediction from Goriely et al's study
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+
+    backward_mc_data = dataset.goriely_uncertainty("backward")
+    forward_mc_data = dataset.goriely_uncertainty("forward")
+
+    colour_map = {
+        r"$\sigma \leq 1$ MeV": "#FBD900",
+        r"$1 < \sigma \leq 2$ MeV": "#00AAF0",
+        r"$2 < \sigma \leq 3$ MeV": "#098000",
+        r"$\sigma \geq 4$ MeV": "#FF1503",
+    }
+
+    hue_order = [
+        r"$\sigma \leq 1$ MeV",
+        r"$1 < \sigma \leq 2$ MeV",
+        r"$2 < \sigma \leq 3$ MeV",
+        r"$\sigma \geq 4$ MeV",
+    ]
+
+    sns.scatterplot(
+        data=forward_mc_data,
+        x="N",
+        y="Z",
+        hue="sigma",
+        palette=colour_map,
+        s=1.8,
+        hue_order=hue_order,
+        edgecolor="none",
+    )
+
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+    ax.legend(title="", loc="lower right", markerscale=3)
 
     plot_utils.savefig(fig, ax, path)
 

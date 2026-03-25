@@ -58,12 +58,47 @@ def extract_variant_moment(variant_mt) -> pd.Series:
     return moment_df
 
 
+def goriely_uncertainty(data_type="forward") -> pd.DataFrame:
+    """Load the dataset from Goriely et al's study, which can be used to make uncertainty plot like Fig.4 on their paper.
+    Args:
+        data_type (str): Type of the dataset from the study. Possible options are backward and forward. From the BFMC in the paper.
+
+    Returns:
+        unc_data (pd.DataFrame) = Uncertainty dataset
+    """
+
+    if data_type == "backward":
+        data = pd.read_parquet("data/input/bsk24_variants_mass_table.parquet")
+    elif data_type == "forward":
+        data = pd.read_parquet("data/input/bsk24_variants_ext_mass_table.parquet")
+    else:
+        raise ValueError(f"Unknown data_type: {data_type}")
+
+    unc_data = data.groupby(["Z", "N"]).agg(m_sigma=("m", "std")).reset_index()
+
+    def categorize(values, labels):
+        bins = [0, 1, 2, 3, float("inf")]
+        return pd.cut(values, bins=bins, labels=labels, right=True)
+
+    unc_data["sigma"] = categorize(
+        unc_data["m_sigma"],
+        [
+            r"$\sigma \leq 1$ MeV",
+            r"$1 < \sigma \leq 2$ MeV",
+            r"$2 < \sigma \leq 3$ MeV",
+            r"$\sigma \geq 4$ MeV",
+        ],
+    )
+
+    return unc_data
+
+
 def epsilon_sigma_dataset(train_data="full") -> pd.DataFrame:
     """Load sigma and epsilon values of nuclei.
     Args:
         train_data (str): The ML dataset to plot, train with certain percentage of input data. Possible options are 025, 05, 1, 2, 4, 8, and full (24). Default to full.
 
-    returns:
+    Returns:
         grouped (pd.DataFrame) : Dataset
     """
 
