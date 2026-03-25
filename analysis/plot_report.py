@@ -644,7 +644,7 @@ def plot_old_data(path_exp, path_ext) -> None:
                 filtered_data["var_train"], filtered_data["rms_dev"], label=f"1:{i}"
             )
 
-        ax.set_xlabel("Variants")
+        ax.set_xlabel("Number of Variants")
         ax.set_ylabel("RMS Deviation (MeV)")
         ax.set_ylim(bottom=0)
 
