@@ -17,10 +17,12 @@ plt.rcParams.update(
     }
 )
 
-# analysis.plot_report.plot_me_bsk_comparison(
-#     "../5_Writing/chapters/1_introduction/image/deviation.pdf"
-# )
+# Chapter 1
+analysis.plot_report.plot_me_bsk_comparison(
+    "../master-thesis/chapters/1_introduction/image/deviation.pdf"
+)
 
+# Chapter 2
 # analysis.plot_report.plot_correlation_illustration(
 #     "../master-thesis/chapters/2_theory/image/correlation_illustration.pdf"
 # )
@@ -29,9 +31,13 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/2_theory/image/bsk_res.pdf"
 # )
 
-analysis.plot_report.plot_goriely_uncertainty(
-    "../master-thesis/chapters/2_theory/image/goriely_uncertainty.pdf"
-)
+# analysis.plot_report.plot_goriely_uncertainty(
+#     "../master-thesis/chapters/2_theory/image/goriely_uncertainty.pdf"
+# )
+
+
+# Chapter 3
+
 
 # analysis.plot_report.plot_loss_convergence(
 #     "../5_Writing/chapters/3_hyperparam_tuning/image/loss_convergence.pdf"
@@ -115,3 +121,7 @@ analysis.plot_report.plot_goriely_uncertainty(
 # analysis.plot_report.plot_pairing_str_diff(
 #     "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
 # )
+
+# Test
+# analysis.plot_report.plot_computational_cost_ch3("test.pdf")
+# analysis.plot_report.plot_cost_full_data("test.pdf")

@@ -39,7 +39,8 @@ def plot_me_bsk_comparison(path: str) -> None:
     )
 
     # Plot all mass excess relative to BSk-32
-    for i in range(20, len(files[:-1])):
+    plotted_bsk = [20, 23, 28, 29, 30]  # BSk number -1 due to python indexing
+    for i in plotted_bsk:
         ref = bsk32_mt[["N", "Mcal"]].rename(columns={"Mcal": "Mcal_ref"})
 
         mass_table = mass_tables[i]
@@ -50,14 +51,13 @@ def plot_me_bsk_comparison(path: str) -> None:
         ax.plot(
             mass_table["N"],
             mass_table["Mcal"] - mass_table["Mcal_ref"],
-            # label=labels[i],
+            label=f"HFB-{labels[i][-2:]}",
             zorder=5,
         )
-    ax.plot([], [], color="black", label="BSk21-31")
 
     ax.set_xlabel("N")
     ax.set_ylabel(r"$m - m_{\mathrm{BSk32}}\;(\mathrm{MeV})$")
-    ax.legend()
+    ax.legend(ncol=2, loc=3)
 
     plot_utils.savefig(fig, ax, path)
 
@@ -937,6 +937,84 @@ def plot_goriely_uncertainty(path: str) -> None:
     ax.set_xlabel("N")
     ax.set_ylabel("Z")
     ax.legend(title="", loc="lower right", markerscale=3)
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_computational_cost_ch3(path: str) -> None:
+    """Plot the computational cost vs number of training datset
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+
+    data = pd.read_csv("data/summary/optimum_data_test.csv")
+    data["training_data_percentage"] = data["run_name"].apply(
+        lambda name: float(name.split("_")[-1]) * 0.8 * 100
+    )
+
+    data["run_time"] = data["run_time"].apply(convert_time_to_s)
+
+    sns.boxplot(
+        x="training_data_percentage",
+        y="run_time",
+        data=data,
+        # fliersize=3,
+        # width=0.5,
+        ax=ax,
+    )
+
+    # Adjust ticks to show only half of them
+    ticks = ax.get_xticks()
+    labels: list[str] = [item.get_text()[:4] for item in ax.get_xticklabels()]
+
+    ax.set_xticks(ticks[::2])
+    ax.set_xticklabels(labels[::2])
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def convert_time_to_s(time):
+    hour = float(time.split(":")[0]) * 3600
+    minute = float(time.split(":")[1]) * 60
+    second = float(time.split(":")[2])
+
+    return hour + minute + second
+
+
+def plot_cost_full_data(path: str) -> None:
+    """Plot the computational cost vs number of training datset
+
+    Args:
+        path (str): path to save the figure
+    """
+
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+
+    files = [p.name for p in Path("data/summary").glob("full_scale*") if p.is_file()]
+    training_data_percentage = []
+    avg_run_time = []
+    avg_dev = []
+
+    for file in files:
+        if file == "full_scale.csv":
+            training_data_percentage.append("24")
+        else:
+            training_data_percentage.append(file.split(".")[0].split("_")[-1])
+
+        data = pd.read_csv("data/summary/" + file)
+        run_time = data["run_time"].apply(convert_time_to_s)
+        avg_run_time.append(np.mean(run_time))
+        avg_dev.append(data["rms_dev"].mean())
+
+    training_data_percentage = [
+        ("0." + s[1:]) if s.startswith("0") else s for s in training_data_percentage
+    ]
+    training_data_percentage = [float(s) for s in training_data_percentage]
+
+    ax.scatter(training_data_percentage, avg_dev)
+    print(avg_dev)
 
     plot_utils.savefig(fig, ax, path)
 
