@@ -93,7 +93,7 @@ def goriely_uncertainty(data_type="forward") -> pd.DataFrame:
     return unc_data
 
 
-def epsilon_sigma_dataset(train_data="full") -> pd.DataFrame:
+def epsilon_sigma_dataset(train_data="full", mass_table=None) -> pd.DataFrame:
     """Load sigma and epsilon values of nuclei.
     Args:
         train_data (str): The ML dataset to plot, train with certain percentage of input data. Possible options are 025, 05, 1, 2, 4, 8, and full (24). Default to full.
@@ -104,6 +104,8 @@ def epsilon_sigma_dataset(train_data="full") -> pd.DataFrame:
 
     if train_data == "full":
         dataset = pd.read_parquet("data/result/full_mass_table.parquet")
+    if train_data == "custom":
+        dataset = mass_table
     else:
         dataset = pd.read_parquet(f"data/result/full_mass_table_{train_data}.parquet")
 

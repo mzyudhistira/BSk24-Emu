@@ -18,9 +18,9 @@ plt.rcParams.update(
 )
 
 # Chapter 1
-analysis.plot_report.plot_me_bsk_comparison(
-    "../master-thesis/chapters/1_introduction/image/deviation.pdf"
-)
+# analysis.plot_report.plot_me_bsk_comparison(
+#     "../master-thesis/chapters/1_introduction/image/deviation.pdf"
+# )
 
 # Chapter 2
 # analysis.plot_report.plot_correlation_illustration(
@@ -121,6 +121,10 @@ analysis.plot_report.plot_me_bsk_comparison(
 # analysis.plot_report.plot_pairing_str_diff(
 #     "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
 # )
+
+# Chapter 4
+analysis.plot_report.plot_uncertainty_low_variants("test.pdf", 100)
+analysis.plot_report.plot_uncertainty_low_variants("test2.pdf", 500)
 
 # Test
 # analysis.plot_report.plot_computational_cost_ch3("test.pdf")
