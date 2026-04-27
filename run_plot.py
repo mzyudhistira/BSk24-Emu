@@ -46,11 +46,11 @@ analysis.plot_report.plot_me_bsk_comparison(
 # analysis.plot_report.plot_robustness_samebase(
 #     "../master-thesis/chapters/3_hyperparam_tuning/image/robustness_samebase.pdf"
 # )
-#
-# analysis.plot_report.plot_robustness_diffbase(
-#     "../master-thesis/chapters/3_hyperparam_tuning/image/robustness_diffbase.pdf"
-# )
-#
+
+analysis.plot_report.plot_robustness_diffbase(
+    "../master-thesis/chapters/3_hyperparam_tuning/image/robustness_diffbase.pdf"
+)
+
 # analysis.plot_report.plot_stability_one(
 #     "../master-thesis/chapters/3_hyperparam_tuning/image/stability_one.pdf"
 # )
