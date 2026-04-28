@@ -154,19 +154,34 @@ def plot_robustness_samebase(path: str) -> None:
     fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 7)))
 
     # Load data
-    data_neuron_addition = pd.read_csv("summary.csv", sep=",").iloc[42:48, :]
+    data_neuron_addition = pd.read_csv("summary.csv", sep=",").iloc[43:48, :]
     data_neuron_drop = pd.read_csv("summary.csv", sep=",").iloc[24:30, :]
+    base_rmse = 0.734
 
     ax[0].scatter(
-        data_neuron_addition["note"].astype(int), data_neuron_addition["rms_dev"]
+        data_neuron_addition["note"].astype(int),
+        data_neuron_addition["rms_dev"],
+        label="Deeper NN",
+    )
+    ax[0].plot(
+        data_neuron_addition["note"].astype(int),
+        base_rmse * np.ones(len(data_neuron_addition)),
+        label="Base NN",
+        color="red",
     )
     ax[0].set_ylabel("RMS Deviation (MeV)")
     ax[0].set_xlabel("Number of additional layer(s)")
     ax[0].set_ylim(0, 1.75)
-    ax[0].set_xticks(np.arange(0, 6))
+    ax[0].set_xticks(np.arange(1, 6))
 
     ax[1].scatter(
         data_neuron_drop["note"].astype(float) * 100, data_neuron_drop["rms_dev"]
+    )
+    ax[1].plot(
+        data_neuron_drop["note"].astype(float) * 100,
+        base_rmse * np.ones(len(data_neuron_drop)),
+        label="Base NN",
+        color="red",
     )
     ax[1].set_xlabel("Dropout rate (\\%)")
     ax[1].set_ylim(0)
@@ -185,17 +200,21 @@ def plot_robustness_diffbase(path: str) -> None:
     fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 7)))
 
     # Load data
-    data_inverse_sequential = pd.read_csv("summary.csv", sep=",").iloc[7:17]
+    data_inverse_sequential = pd.read_csv("summary.csv", sep=",").iloc[48:53]
     data_bottleneck = pd.read_csv("summary.csv", sep=",").iloc[17:24]
+    # print(pd.read_csv("summary.csv", sep=",").iloc[48:53])
+    base_rmse = 0.734
 
     # Plot inverse sequential result
-    ax[0].scatter(np.arange(1, 11), data_inverse_sequential["rms_dev"])
+    ax[0].scatter(np.arange(1, 6), data_inverse_sequential["rms_dev"])
+    ax[0].plot(np.arange(1, 6), np.ones(5) * base_rmse, color="red")
     ax[0].set_ylabel("RMS Deviation (MeV)")
-    ax[0].set_xticks(np.arange(1, 11, 2))
-    ax[0].set_ylim(bottom=0, top=0.8)
+    ax[0].set_xticks(np.arange(1, 7))
+    ax[0].set_ylim(bottom=0, top=2)
 
     # Plot bottleneck result
     ax[1].scatter(np.arange(1, 8), data_bottleneck["rms_dev"])
+    ax[1].plot(np.arange(1, 8), np.ones(7) * base_rmse, color="red")
     ax[1].set_xticks(np.arange(1, 8, 2))
     ax[1].set_ylim(bottom=0, top=1.25)
 
