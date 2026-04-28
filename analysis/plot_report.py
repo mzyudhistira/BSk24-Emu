@@ -1038,6 +1038,57 @@ def plot_cost_full_data(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_uncertainty_low_variants(path: str, num_variants) -> None:
+    """Plot the computational cost vs number of training datset
+
+    Args:
+        path (str): path to save the figure
+        num_variants (int): number of variants
+    """
+
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+
+    mass_table = pd.read_parquet("data/result/full_mass_table_1.parquet")
+    sample_variants = np.random.choice(range(1, 10023), num_variants)
+    mass_table = mass_table[mass_table["variant_id"].isin(sample_variants)]
+
+    aggregated_data = dataset.epsilon_sigma_dataset(
+        train_data="custom", mass_table=mass_table
+    )
+
+    colour_map = {
+        r"$\sigma \leq 1$ MeV": "#FBD900",
+        r"$1 < \sigma \leq 2$ MeV": "#00AAF0",
+        r"$2 < \sigma \leq 3$ MeV": "#098000",
+        r"$\sigma \geq 4$ MeV": "#FF1503",
+    }
+
+    hue_order = [
+        r"$\sigma \leq 1$ MeV",
+        r"$1 < \sigma \leq 2$ MeV",
+        r"$2 < \sigma \leq 3$ MeV",
+        r"$\sigma \geq 4$ MeV",
+    ]
+
+    sns.scatterplot(
+        data=aggregated_data,
+        x="N",
+        y="Z",
+        hue="sigma",
+        palette=colour_map,
+        s=1.8,
+        hue_order=hue_order,
+        edgecolor="none",
+    )
+
+    ax.set_xlabel("N")
+    ax.set_ylabel("Z")
+    ax.set_title(f"{num_variants} variants")
+    ax.legend(title="", loc="lower right", markerscale=3)
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()
