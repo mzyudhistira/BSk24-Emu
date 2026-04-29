@@ -1046,7 +1046,7 @@ def plot_uncertainty_low_variants(path: str, num_variants) -> None:
         num_variants (int): number of variants
     """
 
-    fig, ax = plt.subplots(figsize=plot_utils.latex_figure())
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(16, 9)))
 
     mass_table = pd.read_parquet("data/result/full_mass_table_1.parquet")
     sample_variants = np.random.choice(range(1, 10023), num_variants)
@@ -1083,7 +1083,6 @@ def plot_uncertainty_low_variants(path: str, num_variants) -> None:
 
     ax.set_xlabel("N")
     ax.set_ylabel("Z")
-    ax.set_title(f"{num_variants} variants")
     ax.legend(title="", loc="lower right", markerscale=3)
 
     plot_utils.savefig(fig, ax, path)
