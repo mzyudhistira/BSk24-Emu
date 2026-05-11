@@ -72,22 +72,26 @@ plt.rcParams.update(
 #         train_data=train_data,
 #     )
 
-analysis.plot_report.plot_uncertainty_low_variants(
-    "../master-thesis/chapters/5_uq_cost/image/unc_100_variants.pdf", 100
-)
-analysis.plot_report.plot_uncertainty_low_variants(
-    "../master-thesis/chapters/5_uq_cost/image/unc_500_variants.pdf", 500
-)
+# analysis.plot_report.plot_uncertainty_low_variants(
+#     "../master-thesis/chapters/5_uq_cost/image/unc_100_variants.pdf", 100
+# )
+# analysis.plot_report.plot_uncertainty_low_variants(
+#     "../master-thesis/chapters/5_uq_cost/image/unc_500_variants.pdf", 500
+# )
 
 # Chapter 5
-# analysis.plot_report.plot_rmse_dist(
-#     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
-# )
-#
-# analysis.plot_report.plot_moment_correlation(
-#     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
-# )
-#
+analysis.plot_report.plot_rmse_dist(
+    "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
+)
+
+analysis.plot_report.plot_moment_correlation(
+    "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+)
+
+analysis.plot_report.plot_variant_variability(
+    "../master-thesis/chapters/4_full_scale/image/percent_outliers.pdf"
+)
+
 # analysis.plot_report.plot_delta_mu(
 #     "../master-thesis/chapters/4_full_scale/image/fullscale_dmu.pdf"
 # )
@@ -95,7 +99,7 @@ analysis.plot_report.plot_uncertainty_low_variants(
 # analysis.plot_report.plot_rstd(
 #     "../master-thesis/chapters/4_full_scale/image/fullscale_rsigma.pdf"
 # )
-
+#
 # analysis.plot_report.plot_epsilon(
 #     "../master-thesis/chapters/4_full_scale/image/fullscale_epsilon.pdf"
 # )

@@ -373,12 +373,19 @@ def plot_rmse_dist(path: str) -> None:
     )
 
     # Load dataset
-    data: pd.DataFrame = pd.read_csv("data/summary/full_scale.csv")
+    data: pd.DataFrame = pd.read_csv("data/summary/full_scale_1.csv")
 
     ax.hist(data["rms_dev"])
     ax.set_yticks(np.arange(0, 9000, 2000))
     ax.set_xlabel(r"$\text{RMSE}_\text{v, ML}$")
     ax.set_ylabel("Frequency")
+
+    print(f"1st Quartile: {data['rms_dev'].quantile(0.25):.3f}")
+    print(f"Median: {data['rms_dev'].median():.3f}")
+    print(f"3rd Quartile: {data['rms_dev'].quantile(0.75):.3f}")
+    print(f"Skew: {data['rms_dev'].skew():.3f}")
+    print(f"Avg: {data['rms_dev'].mean():.3f}")
+    print(f"Xth Quartile: {data['rms_dev'].quantile(0.76):.3f}")
 
     plot_utils.savefig(fig, ax, path)
 
@@ -394,7 +401,7 @@ def plot_moment_correlation(path: str) -> None:
     )
 
     # Load the dataset
-    full_result = pd.read_parquet("data/result/full_mass_table.parquet")
+    full_result = pd.read_parquet("data/result/full_mass_table_1.parquet")
     moment_df = (
         full_result.groupby(["variant_id"])
         .apply(dataset.extract_variant_moment)
@@ -467,7 +474,7 @@ def plot_delta_mu(path) -> None:
     fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
 
     # Load data
-    data: pd.DataFrame = pd.read_parquet("data/result/full_mass_table.parquet")
+    data: pd.DataFrame = pd.read_parquet("data/result/full_mass_table_1.parquet")
     aggregated_data: pd.DataFrame = (
         data.groupby(by=["Z", "N"])
         .agg(
@@ -509,7 +516,7 @@ def plot_rstd(path) -> None:
     fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
 
     # Load data
-    data: pd.DataFrame = pd.read_parquet("data/result/full_mass_table.parquet")
+    data: pd.DataFrame = pd.read_parquet("data/result/full_mass_table_1.parquet")
     aggregated_data: pd.DataFrame = (
         data.groupby(by=["Z", "N"])
         .agg(
@@ -551,7 +558,7 @@ def plot_epsilon(path) -> None:
     fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(16, 9)))
 
     # Load Data
-    data = dataset.epsilon_sigma_dataset()
+    data = dataset.epsilon_sigma_dataset(train_data="1")
 
     colour_map = {
         r"$\epsilon \leq 1$ MeV": "#FBD900",
@@ -1084,6 +1091,65 @@ def plot_uncertainty_low_variants(path: str, num_variants) -> None:
     ax.set_xlabel("N")
     ax.set_ylabel("Z")
     ax.legend(title="", loc="lower right", markerscale=3)
+
+    plot_utils.savefig(fig, ax, path)
+
+
+# Test
+def plot_variant_variability(path: str) -> None:
+    """Plot the number of outliers in the variants and ml predictions
+
+    Args:
+        path (str): path to save the figure
+    """
+
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(fraction=0.8))
+
+    mass_table = pd.read_parquet("data/result/full_mass_table_1.parquet")
+
+    for label in ["target", "prediction"]:
+        summary = (
+            mass_table.groupby("variant_id")[label]
+            .agg(
+                count="count",
+                mean="mean",
+                median=lambda x: x.quantile(0.5),
+                q1=lambda x: x.quantile(0.25),
+                q3=lambda x: x.quantile(0.75),
+            )
+            .reset_index()
+        )
+
+        summary["iqr"] = summary["q3"] - summary["q1"]
+        summary["lower_bound"] = summary["q1"] - 1.5 * summary["iqr"]
+        summary["upper_bound"] = summary["q3"] + 1.5 * summary["iqr"]
+
+        bounds = summary.set_index("variant_id")[["lower_bound", "upper_bound"]]
+        outlier_counts = (
+            mass_table.join(bounds, on="variant_id")
+            .assign(
+                is_outlier=lambda d: (
+                    (d[label] < d["lower_bound"]) | (d[label] > d["upper_bound"])
+                )
+            )
+            .groupby("variant_id")["is_outlier"]
+            .sum()
+            .rename("n_outliers")
+            .reset_index()
+        )
+
+        result = summary.merge(outlier_counts, on="variant_id")
+        result["percent_outliers"] = result["n_outliers"] / result["count"] * 100
+
+        print(
+            f"Number of {label} Outliers: {result[result['percent_outliers'] > 1].shape[0]}"
+        )
+
+        label_plot = "Variants" if label == "target" else "ML"
+        sns.histplot(data=result, x="percent_outliers", ax=ax, label=label_plot)
+
+    ax.legend()
+    ax.set_xlabel(r"Proportion of Outliers (\%)")
 
     plot_utils.savefig(fig, ax, path)
 
