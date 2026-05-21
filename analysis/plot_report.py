@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import pearsonr, spearmanr, skew
 
 from . import plot_utils
 from . import dataset
@@ -687,7 +687,7 @@ def plot_eps_dist_weight(path) -> None:
     """
     fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
 
-    grouped = pd.read_parquet("data/result/full_mt_grouped.parquet")
+    grouped = dataset.epsilon_sigma_dataset(train_data="1")
     grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
         "target_std"
     ]
@@ -695,6 +695,7 @@ def plot_eps_dist_weight(path) -> None:
 
     heavy_nuclei = grouped[grouped["A"] > 50]["diff"]
     light_nuclei = grouped[grouped["A"] <= 50]["diff"]
+
     # Plot each histogram on a different subplot
     sns.histplot(heavy_nuclei, stat="percent", ax=ax[0])
     ax[0].set_title("Heavy Nuclei")
@@ -719,6 +720,29 @@ def plot_eps_dist_weight(path) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def pandas_sampling_test(
+    number_of_run: int = 10000, percent_sampling: float = 1
+) -> None:
+    """Test the uniform sampling of Pandas on choosing nuclei
+
+    Args:
+        number_of_run (int): Number of run to test, default to 10,000
+        percent_sampling (float): Percentage of sampling, default to 1% of nuclei
+    """
+    result_array = []
+
+    for i in range(number_of_run):
+        mass_table = pd.read_parquet("data/result/full_mt_grouped.parquet")
+        mass_table["A"] = mass_table["Z"] + mass_table["N"]
+
+        sampled_nuclei = mass_table.sample(frac=percent_sampling / 100)
+        light_nuclei = sampled_nuclei[sampled_nuclei["A"] <= 50].shape[0]
+        percent_light_nuclei = light_nuclei / sampled_nuclei.shape[0] * 100
+        result_array.append(percent_light_nuclei)
+
+    print(np.mean(result_array))
+
+
 def plot_eps_dist_magic(path: str) -> None:
     """Plot the epsilon distribution of magic and tradtional magic nuclei
 
@@ -729,26 +753,34 @@ def plot_eps_dist_magic(path: str) -> None:
         1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)), sharey=True
     )
 
-    grouped = pd.read_parquet("data/result/full_mt_grouped.parquet")
+    grouped = dataset.epsilon_sigma_dataset(train_data="1")
     grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
         "target_std"
     ]
     grouped["A"] = grouped["Z"] + grouped["N"]
 
     magic_N = [2, 8, 14, 20, 28, 40, 50, 82, 126, 184]
-    magic_Z = [2, 8, 20, 28, 50, 82, 126]
+    magic_Z = [2, 8, 20, 28, 50, 82, 114]
 
     traditional_magic_Z = [2, 8, 20, 28, 50, 82]
     traditional_magic_N = [2, 8, 20, 28, 50, 82, 126]
 
+    non_magic_nuclei = grouped[
+        (~grouped["N"].isin(magic_N)) & (~grouped["Z"].isin(magic_Z))
+    ]["diff"]
+
     magic_nuclei = grouped[(grouped["N"].isin(magic_N)) | (grouped["Z"].isin(magic_Z))][
         "diff"
     ]
+
     traditional_magic_nuclei = grouped[
         (grouped["N"].isin(traditional_magic_N))
         | (grouped["Z"].isin(traditional_magic_Z))
     ]["diff"]
 
+    print(
+        f"Percentage Non-magic: {non_magic_nuclei.shape[0] / grouped.shape[0] * 100:.2f}"
+    )
     print(f"Percentage Magic: {magic_nuclei.shape[0] / grouped.shape[0] * 100:.2f}")
     print(
         f"Percentage Traditional Magic: {traditional_magic_nuclei.shape[0] / grouped.shape[0] * 100:.2f}"
@@ -766,6 +798,13 @@ def plot_eps_dist_magic(path: str) -> None:
 
     fig.supxlabel(r"$\epsilon$")
 
+    print(f"avg nonmagic: {non_magic_nuclei.mean()}")
+    print(f"avg magic: {magic_nuclei.mean()}")
+    print(f"avg tmagic: {traditional_magic_nuclei.mean()}")
+
+    print(
+        f"IQR_Non Magic Nuclei: {non_magic_nuclei.quantile(0.75) - non_magic_nuclei.quantile(0.25):.3f}"
+    )
     print(
         f"IQR_Magic Nuclei: {magic_nuclei.quantile(0.75) - magic_nuclei.quantile(0.25):.3f}"
     )
@@ -786,9 +825,8 @@ def plot_eps_dist_magic_distance(path: str) -> None:
         1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)), sharey=True
     )
 
-    # Load data
-    data = pd.read_parquet("data/result/full_mt_grouped.parquet")
-    # data = data []
+    data = dataset.epsilon_sigma_dataset(train_data="1")
+
     magic_number = [8, 20, 28, 50, 82, 126]
     data["eps"] = (data["target_mean"] - data["prediction_mean"]) / data["target_std"]
     data["dist_N"] = abs(data["N"].values[:, None] - magic_number).min(axis=1)
@@ -796,12 +834,26 @@ def plot_eps_dist_magic_distance(path: str) -> None:
     filtered_data = data[abs(data["eps"]) > 1]
 
     # Plot
-    sns.histplot(filtered_data["dist_N"], stat="percent", ax=ax[0], binwidth=4)
+    sns.histplot(
+        filtered_data["dist_N"],
+        stat="percent",
+        ax=ax[0],
+        binwidth=4,
+        label=r"$\epsilon>1$",
+    )
     ax[0].set_xlabel(r"$\Delta N_m$")
+    # ax[0].legend()
 
-    sns.histplot(filtered_data["dist_Z"], stat="percent", ax=ax[1], binwidth=1)
+    sns.histplot(
+        filtered_data["dist_Z"],
+        stat="percent",
+        ax=ax[1],
+        binwidth=1,
+        label=r"$\epsilon>1$",
+    )
     ax[1].set_xlabel(r"$\Delta Z_m$")
     ax[1].set_ylabel("")
+    # ax[1].legend()
 
     plot_utils.savefig(fig, ax, path)
 
@@ -825,11 +877,7 @@ def plot_param_correlation(path: str) -> None:
     # Set x_2 to t_2.x_2
     skyrme_param["param(09)"] = skyrme_param["param(09)"] * skyrme_param["param(03)"]
 
-    # Set param to relative param i.e. (param_variant - param_bsk)
-    skyrme_param.iloc[:, 1:] = skyrme_param.apply(
-        dataset.relative_skyrme, axis=1, result_type="expand"
-    )
-
+    # Test parameter distribution
     moment_n_skyrme = pd.merge(
         moment_df[["variant_id", "rms_dev", "r_std", "variant_rms", "ml_rms"]],
         skyrme_param,
@@ -849,8 +897,6 @@ def plot_param_correlation(path: str) -> None:
         for column in result_columns:
             corr = moment_n_skyrme[[index, column]].corr(method="spearman").iloc[0, 1]
             corr_matrix.loc[index, column] = round(corr, 3)
-
-    # display(corr_matrix)
 
     column_name = [
         r"$t_0$",
@@ -1150,6 +1196,49 @@ def plot_variant_variability(path: str) -> None:
 
     ax.legend()
     ax.set_xlabel(r"Proportion of Outliers (\%)")
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_odd_even_test(path: str) -> None:
+    """Plot the test of odd even influence to the error of variant.
+
+    Args:
+        path (str): path to save the figure
+    """
+
+    fig, ax = plt.subplots(
+        1, 2, figsize=plot_utils.latex_figure(ratio=(16, 7.5)), sharey=True
+    )
+
+    agg = pd.read_csv("data/summary/full_scale_1.csv", sep=",")
+    agg["variant_id"] = agg["run_name"].str.split("_").str[1].astype("Int64")
+    agg = agg[["variant_id", "rms_dev"]]
+    agg.sort_values("variant_id", inplace=True)
+    agg.reset_index(inplace=True, drop=True)
+
+    param = pd.read_parquet("data/input/bsk24_variants_ext.parquet")[
+        ["varian_id", "param(05)", "param(18)", "param(19)", "param(20)"]
+    ]
+    param = param.rename(columns={"varian_id": "variant_id"})
+
+    data = agg.merge(param, on="variant_id")
+    print(data)
+
+    ax[1].scatter(
+        data["param(05)"],
+        data["rms_dev"],
+        s=4,
+    )
+    ax[1].set_xlabel(r"$t_4$")
+
+    ax[0].scatter(
+        data["param(20)"],
+        data["rms_dev"],
+        s=4,
+    )
+    ax[0].set_ylabel(r"$\mu^\text{RMSE}$")
+    ax[0].set_xlabel(r"$f_p^-$")
 
     plot_utils.savefig(fig, ax, path)
 

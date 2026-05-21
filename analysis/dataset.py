@@ -97,6 +97,7 @@ def epsilon_sigma_dataset(train_data="full", mass_table=None) -> pd.DataFrame:
     """Load sigma and epsilon values of nuclei.
     Args:
         train_data (str): The ML dataset to plot, train with certain percentage of input data. Possible options are 025, 05, 1, 2, 4, 8, and full (24). Default to full.
+        mass_table (pd.DataFrame): Custom mass table
 
     Returns:
         grouped (pd.DataFrame) : Dataset

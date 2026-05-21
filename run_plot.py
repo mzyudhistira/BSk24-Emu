@@ -80,18 +80,18 @@ plt.rcParams.update(
 # )
 
 # Chapter 5
-analysis.plot_report.plot_rmse_dist(
-    "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
-)
-
-analysis.plot_report.plot_moment_correlation(
-    "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
-)
-
-analysis.plot_report.plot_variant_variability(
-    "../master-thesis/chapters/4_full_scale/image/percent_outliers.pdf"
-)
-
+# analysis.plot_report.plot_rmse_dist(
+#     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
+# )
+#
+# analysis.plot_report.plot_moment_correlation(
+#     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+# )
+#
+# analysis.plot_report.plot_variant_variability(
+#     "../master-thesis/chapters/4_full_scale/image/percent_outliers.pdf"
+# )
+#
 # analysis.plot_report.plot_delta_mu(
 #     "../master-thesis/chapters/4_full_scale/image/fullscale_dmu.pdf"
 # )
@@ -108,17 +108,23 @@ analysis.plot_report.plot_variant_variability(
 #     "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
 # )
 #
+# analysis.plot_report.pandas_sampling_test()
+
 # analysis.plot_report.plot_eps_dist_magic(
 #     "../master-thesis/chapters/4_full_scale/image/eps_magic.pdf"
 # )
-
+#
 # analysis.plot_report.plot_eps_dist_magic_distance(
 #     "../master-thesis/chapters/4_full_scale/image/eps_magic_dist.pdf"
 # )
 
-# analysis.plot_report.plot_param_correlation(
-#     "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
-# )
+analysis.plot_report.plot_param_correlation(
+    "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
+)
+
+analysis.plot_report.plot_odd_even_test(
+    "../master-thesis/chapters/4_full_scale/image/mu_param_scatter.pdf"
+)
 
 # analysis.plot_report.plot_pairing_str_diff(
 #     "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
