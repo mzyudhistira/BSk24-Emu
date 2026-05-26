@@ -118,17 +118,17 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/eps_magic_dist.pdf"
 # )
 
-analysis.plot_report.plot_param_correlation(
-    "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
-)
-
-analysis.plot_report.plot_odd_even_test(
+# analysis.plot_report.plot_param_correlation(
+#     "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
+# )
+#
+analysis.plot_report.plot_rmse_param(
     "../master-thesis/chapters/4_full_scale/image/mu_param_scatter.pdf"
 )
 
-# analysis.plot_report.plot_pairing_str_diff(
-#     "../master-thesis/chapters/4_full_scale/image/pairing_str_diff.pdf"
-# )
+analysis.plot_report.plot_param_dist(
+    "../master-thesis/chapters/4_full_scale/image/param_dist.pdf"
+)
 
 # Appendix
 # analysis.plot_report.plot_old_data(

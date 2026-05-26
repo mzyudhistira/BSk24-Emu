@@ -1200,8 +1200,8 @@ def plot_variant_variability(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
-def plot_odd_even_test(path: str) -> None:
-    """Plot the test of odd even influence to the error of variant.
+def plot_rmse_param(path: str) -> None:
+    """Plot the test of RMSE distribution wrt parameters
 
     Args:
         path (str): path to save the figure
@@ -1222,8 +1222,12 @@ def plot_odd_even_test(path: str) -> None:
     ]
     param = param.rename(columns={"varian_id": "variant_id"})
 
+    full_param = pd.read_parquet("data/input/bsk24_variants_ext.parquet").iloc[:, 2:23]
+    bsk24_param = pd.read_csv("data/input/bsk24.csv", sep=";").to_numpy()[0]
+    full_param = full_param - bsk24_param
+    print(full_param.skew())
+
     data = agg.merge(param, on="variant_id")
-    print(data)
 
     ax[1].scatter(
         data["param(05)"],
@@ -1239,6 +1243,38 @@ def plot_odd_even_test(path: str) -> None:
     )
     ax[0].set_ylabel(r"$\mu^\text{RMSE}$")
     ax[0].set_xlabel(r"$f_p^-$")
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_param_dist(path: str) -> None:
+    """Plot the test of parameters' distribution
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(fraction=0.8))
+
+    variants_param = pd.read_parquet("data/input/bsk24_variants_ext.parquet")
+    variants_param.rename(columns={"varian_id": "variant_id"}, inplace=True)
+    variants_param = pd.concat(
+        [variants_param["variant_id"], variants_param.iloc[:, 2:23]], axis=1
+    )
+    variants_param["param(09)"] = (
+        variants_param["param(09)"] * variants_param["param(03)"]
+    )  # Set x_2 to t_2.x_2
+
+    bsk24_param = pd.read_csv("data/input/bsk24.csv", sep=";").to_numpy()[0]
+
+    relative_param = (variants_param.iloc[:, 1:] - bsk24_param) * 100 / bsk24_param
+
+    sns.histplot(relative_param["param(17)"], stat="percent", ax=ax, label=r"$f_n^+$")
+    sns.histplot(relative_param["param(18)"], stat="percent", ax=ax, label=r"$f_n^-$")
+    sns.histplot(relative_param["param(19)"], stat="percent", ax=ax, label=r"$f_p^+$")
+    sns.histplot(relative_param["param(20)"], stat="percent", ax=ax, label=r"$f_p^-$")
+
+    ax.set_xlabel(r" $\Delta p$ (\%)")
+    ax.legend()
 
     plot_utils.savefig(fig, ax, path)
 
