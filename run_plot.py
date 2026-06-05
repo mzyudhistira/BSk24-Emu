@@ -21,7 +21,7 @@ plt.rcParams.update(
 # analysis.plot_report.plot_me_bsk_comparison(
 #     "../master-thesis/chapters/1_introduction/image/deviation.pdf"
 # )
-#
+
 # # Chapter 2
 # analysis.plot_report.plot_correlation_illustration(
 #     "../master-thesis/chapters/2_theory/image/correlation_illustration.pdf"
@@ -80,9 +80,9 @@ plt.rcParams.update(
 # )
 
 # Chapter 5
-# analysis.plot_report.plot_rmse_dist(
-#     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
-# )
+analysis.plot_report.plot_rmse_dist(
+    "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
+)
 #
 # analysis.plot_report.plot_moment_correlation(
 #     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
@@ -122,13 +122,13 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/param_correlation.pdf"
 # )
 #
-analysis.plot_report.plot_rmse_param(
-    "../master-thesis/chapters/4_full_scale/image/mu_param_scatter.pdf"
-)
-
-analysis.plot_report.plot_param_dist(
-    "../master-thesis/chapters/4_full_scale/image/param_dist.pdf"
-)
+# analysis.plot_report.plot_rmse_param(
+#     "../master-thesis/chapters/4_full_scale/image/mu_param_scatter.pdf"
+# )
+#
+# analysis.plot_report.plot_param_dist(
+#     "../master-thesis/chapters/4_full_scale/image/param_dist.pdf"
+# )
 
 # Appendix
 # analysis.plot_report.plot_old_data(

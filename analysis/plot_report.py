@@ -376,7 +376,7 @@ def plot_rmse_dist(path: str) -> None:
     data: pd.DataFrame = pd.read_csv("data/summary/full_scale_1.csv")
 
     ax.hist(data["rms_dev"])
-    ax.set_yticks(np.arange(0, 9000, 2000))
+    ax.set_yscale("log")
     ax.set_xlabel(r"$\text{RMSE}_\text{v, ML}$")
     ax.set_ylabel("Frequency")
 
@@ -387,7 +387,8 @@ def plot_rmse_dist(path: str) -> None:
     print(f"Avg: {data['rms_dev'].mean():.3f}")
     print(f"Xth Quartile: {data['rms_dev'].quantile(0.76):.3f}")
 
-    plot_utils.savefig(fig, ax, path)
+    fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_moment_correlation(path: str) -> None:
@@ -961,10 +962,10 @@ def plot_pairing_str_diff(path: str) -> None:
     df_n = data["param(18)"] - data["param(17)"]
     df_p = data["param(20)"] - data["param(19)"]
 
-    sns.histplot(df_n, stat="percent", label="$\Delta f_n$", ax=ax)
-    sns.histplot(df_p, stat="percent", label="$\Delta f_p$", ax=ax)
+    sns.histplot(df_n, stat="percent", label=r"$\Delta f_n$", ax=ax)
+    sns.histplot(df_p, stat="percent", label=r"$\Delta f_p$", ax=ax)
 
-    ax.set_xlabel("$\Delta f$")
+    ax.set_xlabel(r"$\Delta f$")
     plt.legend()
 
     plot_utils.savefig(fig, ax, path)
