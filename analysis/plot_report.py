@@ -451,7 +451,7 @@ def plot_moment_correlation(path: str) -> None:
             r"$r_\sigma$",
             r"$\Delta$RMS",
             r"$\mu_\text{RMS}^\text{ML}$",
-            r"$\mu^\text{ML}$",
+            r"$\bar{\mu}^\text{ML}$",
             r"$\sigma^\text{ML}$",
             r"$\gamma^\text{ML}$",
         ],

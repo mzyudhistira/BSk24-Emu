@@ -80,14 +80,14 @@ plt.rcParams.update(
 # )
 
 # Chapter 5
-analysis.plot_report.plot_rmse_dist(
-    "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
-)
-#
-# analysis.plot_report.plot_moment_correlation(
-#     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+# analysis.plot_report.plot_rmse_dist(
+#     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
 # )
-#
+
+analysis.plot_report.plot_moment_correlation(
+    "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+)
+
 # analysis.plot_report.plot_variant_variability(
 #     "../master-thesis/chapters/4_full_scale/image/percent_outliers.pdf"
 # )
