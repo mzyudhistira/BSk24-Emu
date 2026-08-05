@@ -84,9 +84,9 @@ plt.rcParams.update(
 #     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
 # )
 
-analysis.plot_report.plot_moment_correlation(
-    "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
-)
+# analysis.plot_report.plot_moment_correlation(
+#     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+# )
 
 # analysis.plot_report.plot_variant_variability(
 #     "../master-thesis/chapters/4_full_scale/image/percent_outliers.pdf"
@@ -107,7 +107,7 @@ analysis.plot_report.plot_moment_correlation(
 # analysis.plot_report.plot_eps_dist_weight(
 #     "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
 # )
-#
+
 # analysis.plot_report.pandas_sampling_test()
 
 # analysis.plot_report.plot_eps_dist_magic(
@@ -139,3 +139,8 @@ analysis.plot_report.plot_moment_correlation(
 # Test
 # analysis.plot_report.plot_computational_cost_ch3("test.pdf")
 # analysis.plot_report.plot_cost_full_data("test.pdf")
+
+# Slides
+analysis.plot_report.plot_training_data_illust(
+    "../thesis-defence/figs/training_data_illust.pdf"
+)
