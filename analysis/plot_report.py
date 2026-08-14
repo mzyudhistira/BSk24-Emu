@@ -21,6 +21,7 @@ def plot_me_bsk_comparison(path: str) -> None:
     # Load all HFB mass tables
     files = [str(mt) for mt in Path("data/others/bsks_mt").iterdir()]
     labels = [file.split("-")[0].split("/")[-1] for file in files]
+    files.sort()
     labels.sort()
     mass_tables = [pd.read_csv(file, skiprows=[0, 2], sep="\\s+") for file in files]
 
@@ -51,13 +52,88 @@ def plot_me_bsk_comparison(path: str) -> None:
         ax.plot(
             mass_table["N"],
             mass_table["Mcal"] - mass_table["Mcal_ref"],
-            label=f"HFB-{labels[i][-2:]}",
+            label=f"BSk-{labels[i][-2:]}",
             zorder=5,
         )
 
     ax.set_xlabel("N")
     ax.set_ylabel(r"$m - m_{\mathrm{BSk32}}\;(\mathrm{MeV})$")
-    ax.legend(ncol=2, loc=3)
+    ax.legend(ncol=2, loc="upper left")
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_bsk_unc_ex(path: str) -> None:
+    """Plot the mass excess predictions of BSk1-32 for A=195 chain and the uncertainty of BSk24
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
+
+    # Load all HFB mass tables
+    files = [str(mt) for mt in Path("data/others/bsks_mt").iterdir()]
+    files.sort()
+    labels = [file.split("-")[0].split("/")[-1] for file in files]
+    labels.sort()
+    mass_tables = [pd.read_csv(file, skiprows=[0, 2], sep="\\s+") for file in files]
+
+    # Define  BSk32 Mass table and filter it
+    bsk32_mt = mass_tables[-1]
+    bsk32_mt["N"] = bsk32_mt["A"] - bsk32_mt["Z"]
+    bsk32_mt = bsk32_mt[(bsk32_mt["A"] == 195) & (bsk32_mt["N"] >= 110)]
+
+    # Plot experimental mass
+    ax.scatter(
+        bsk32_mt["N"].iloc[-10:],
+        bsk32_mt["Mexp-Mcal"].iloc[-10:],
+        label="Exp",
+        zorder=10,
+        color="black",
+    )
+
+    # Plot all mass excess relative to BSk-32
+    plotted_bsk = [20, 23, 28, 29, 30]  # BSk number -1 due to python indexing
+    for i in plotted_bsk:
+        ref = bsk32_mt[["N", "Mcal"]].rename(columns={"Mcal": "Mcal_ref"})
+
+        mass_table = mass_tables[i]
+        mass_table["N"] = mass_table["A"] - mass_table["Z"]
+        mass_table = mass_table[(mass_table["A"] == 195) & (mass_table["N"] >= 110)]
+        mass_table = mass_table.merge(ref, on="N", how="inner")
+
+        ax.plot(
+            mass_table["N"],
+            mass_table["Mcal"] - mass_table["Mcal_ref"],
+            label=f"BSk-{labels[i][-2:]}",
+            zorder=5,
+        )
+
+    # Plot the uncertainty of BSk24
+    bsk24_table = mass_tables[23]
+    bsk24_table["N"] = bsk24_table["A"] - bsk24_table["Z"]
+    bsk24_table = bsk24_table[(bsk24_table["A"] == 195) & (bsk24_table["N"] >= 110)]
+    bsk24_table = bsk24_table.merge(ref, on="N", how="inner")
+
+    variant_table = pd.read_parquet("data/input/bsk24_variants_ext_mass_table.parquet")
+
+    grouped = (
+        variant_table.groupby(["Z", "N"])
+        .agg(mean=("m", "mean"), std=("m", "std"))
+        .reset_index()
+    )
+
+    bsk24_unc = bsk24_table.merge(grouped, on=["Z", "N"], how="left")
+    bsk24_unc = bsk24_unc[bsk24_unc["std"].notna()]
+
+    lower = bsk24_unc["Mcal"] - bsk24_unc["Mcal_ref"] - 2 * bsk24_unc["std"]
+    upper = bsk24_unc["Mcal"] - bsk24_unc["Mcal_ref"] + 2 * bsk24_unc["std"]
+
+    ax.fill_between(bsk24_unc["N"], lower, upper, alpha=0.25, color="#ff7f0e")
+
+    ax.set_xlabel("N")
+    ax.set_ylabel(r"$m - m_{\mathrm{BSk32}}\;(\mathrm{MeV})$")
+    ax.legend(ncol=2, loc="upper left")
 
     plot_utils.savefig(fig, ax, path)
 
@@ -362,7 +438,7 @@ def plot_ic50_analysis(path: str) -> None:
 
 
 def plot_rmse_dist(path: str) -> None:
-    """Plot the RMSE distribution of full scale simulation on 24% dataset
+    """Plot the RMSE distribution of full scale simulation on 1% dataset
 
     Args:
         path (str): path to save the figure
@@ -377,15 +453,15 @@ def plot_rmse_dist(path: str) -> None:
 
     ax.hist(data["rms_dev"])
     ax.set_yscale("log")
-    ax.set_xlabel(r"$\text{RMSE}_\text{v, ML}$")
-    ax.set_ylabel("Frequency")
+    ax.set_xlabel(r"$\text{RMSE}_\text{v, ML} \text{(MeV)}$")
+    ax.set_ylabel("Number of Variants")
 
     print(f"1st Quartile: {data['rms_dev'].quantile(0.25):.3f}")
     print(f"Median: {data['rms_dev'].median():.3f}")
     print(f"3rd Quartile: {data['rms_dev'].quantile(0.75):.3f}")
     print(f"Skew: {data['rms_dev'].skew():.3f}")
     print(f"Avg: {data['rms_dev'].mean():.3f}")
-    print(f"Xth Quartile: {data['rms_dev'].quantile(0.76):.3f}")
+    print(f"Xth Quartile: {data['rms_dev'].quantile(0.95):.3f}")
 
     fig.savefig(path, bbox_inches="tight")
     plt.close(fig)
@@ -686,7 +762,8 @@ def plot_eps_dist_weight(path) -> None:
     Args:
         path (str): path to save the figure
     """
-    fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+    # fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(18, 8)))
 
     grouped = dataset.epsilon_sigma_dataset(train_data="1")
     grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
@@ -698,14 +775,14 @@ def plot_eps_dist_weight(path) -> None:
     light_nuclei = grouped[grouped["A"] <= 50]["diff"]
 
     # Plot each histogram on a different subplot
-    sns.histplot(heavy_nuclei, stat="percent", ax=ax[0])
-    ax[0].set_title("Heavy Nuclei")
-    ax[0].set_xlabel("")
+    sns.histplot(heavy_nuclei, stat="percent", ax=ax, label="Heavy")
+    # ax[0].set_title("Heavy Nuclei")
+    # ax[0].set_xlabel("")
 
-    sns.histplot(light_nuclei, stat="percent", ax=ax[1])
-    ax[1].set_title("Light Nuclei")
-    ax[1].set_ylabel("")
-    ax[1].set_xlabel("")
+    sns.histplot(light_nuclei, stat="percent", ax=ax, label="Light")
+    # ax[1].set_title("Light Nuclei")
+    # ax[1].set_ylabel("")
+    # ax[1].set_xlabel("")
 
     fig.supxlabel(r"$\epsilon$")
 

@@ -18,9 +18,9 @@ plt.rcParams.update(
 )
 
 # Chapter 1
-# analysis.plot_report.plot_me_bsk_comparison(
-#     "../master-thesis/chapters/1_introduction/image/deviation.pdf"
-# )
+analysis.plot_report.plot_me_bsk_comparison(
+    "../5_Writing/chapters/1_introduction/image/deviation.pdf"
+)
 
 # # Chapter 2
 # analysis.plot_report.plot_correlation_illustration(
@@ -32,7 +32,6 @@ plt.rcParams.update(
 # )
 
 # Chapter 3
-
 # analysis.plot_report.plot_loss_convergence(
 #     "../5_Writing/chapters/3_hyperparam_tuning/image/loss_convergence.pdf"
 # )
@@ -81,12 +80,12 @@ plt.rcParams.update(
 
 # Chapter 5
 # analysis.plot_report.plot_rmse_dist(
-#     "../master-thesis/chapters/4_full_scale/image/rmse_dist.pdf"
+#     "../5_Writing/chapters/4_full_scale/image/rmse_dist.pdf"
 # )
 
-analysis.plot_report.plot_moment_correlation(
-    "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
-)
+# analysis.plot_report.plot_moment_correlation(
+#     "../master-thesis/chapters/4_full_scale/image/moment_corr.pdf"
+# )
 
 # analysis.plot_report.plot_variant_variability(
 #     "../master-thesis/chapters/4_full_scale/image/percent_outliers.pdf"
@@ -107,7 +106,7 @@ analysis.plot_report.plot_moment_correlation(
 # analysis.plot_report.plot_eps_dist_weight(
 #     "../master-thesis/chapters/4_full_scale/image/eps_weight.pdf"
 # )
-#
+
 # analysis.plot_report.pandas_sampling_test()
 
 # analysis.plot_report.plot_eps_dist_magic(
@@ -139,3 +138,6 @@ analysis.plot_report.plot_moment_correlation(
 # Test
 # analysis.plot_report.plot_computational_cost_ch3("test.pdf")
 # analysis.plot_report.plot_cost_full_data("test.pdf")
+
+# Defence
+analysis.plot_report.plot_bsk_unc_ex("../thesis-defence/figs/allbskunc.pdf")
