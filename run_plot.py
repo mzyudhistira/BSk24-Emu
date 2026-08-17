@@ -18,9 +18,9 @@ plt.rcParams.update(
 )
 
 # Chapter 1
-analysis.plot_report.plot_me_bsk_comparison(
-    "../5_Writing/chapters/1_introduction/image/deviation.pdf"
-)
+# analysis.plot_report.plot_me_bsk_comparison(
+# "../5_Writing/chapters/1_introduction/image/deviation.pdf"
+# )
 
 # # Chapter 2
 # analysis.plot_report.plot_correlation_illustration(
@@ -140,4 +140,5 @@ analysis.plot_report.plot_me_bsk_comparison(
 # analysis.plot_report.plot_cost_full_data("test.pdf")
 
 # Defence
-analysis.plot_report.plot_bsk_unc_ex("../thesis-defence/figs/allbskunc.pdf")
+# analysis.plot_report.plot_bsk_unc_ex("../thesis-defence/figs/allbskunc.pdf")
+analysis.plot_report.plot_bsk_rmse("../thesis-defence/figs/allbskrmse.pdf")

@@ -1464,3 +1464,40 @@ def plot_pure_uncertainty():
     plt.tight_layout()
     plt.savefig("../5_Writing/chapters/5_uq_cost/image/unc_pure.png")
     plt.close()
+
+
+def plot_bsk_rmse(path: str) -> None:
+    """Plot the mass excess predictions of BSk1-32 for A=195 chain. This plot is used in introduction.
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(figsize=plot_utils.latex_figure(ratio=(9, 5)))
+
+    # Load all HFB mass tables
+    files = [str(mt) for mt in Path("data/others/bsks_mt").iterdir()]
+    labels = [file.split("-")[0].split("/")[-1] for file in files]
+    files.sort()
+    labels.sort()
+    mass_tables = [pd.read_csv(file, skiprows=[0, 2], sep="\\s+") for file in files]
+    rmse_arr = []
+
+    for mt in mass_tables:
+        if "Mexp-Mcal" in mt.columns:
+            # print("in")
+            mt.rename(columns={"Mexp-Mcal": "Err"}, inplace=True)
+
+        if "Err" in mt.columns:
+            # mt["Err"] = pd.to_numeric(mt["Err"], errors="coerce")
+            mt = mt[mt["Err"] < 100.0]
+        mt["Err"] = mt["Err"].astype(float)
+        mt = mt[mt["Err"] < 100.0]
+        rmse = np.sqrt((mt["Err"] ** 2).mean())
+        rmse_arr.append(rmse)
+
+    ax.bar(np.arange(1, len(rmse_arr) + 1), rmse_arr)
+    ax.set_ylim(ymin=0, ymax=1)
+    ax.set_xlabel("BSk Model")
+    ax.set_ylabel("RMSE")
+
+    plot_utils.savefig(fig, ax, path)
