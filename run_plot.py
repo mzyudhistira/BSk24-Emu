@@ -142,3 +142,7 @@ plt.rcParams.update(
 # Defence
 # analysis.plot_report.plot_bsk_unc_ex("../thesis-defence/figs/allbskunc.pdf")
 analysis.plot_report.plot_bsk_rmse("../thesis-defence/figs/allbskrmse.pdf")
+# Slides
+analysis.plot_report.plot_training_data_illust(
+    "../thesis-defence/figs/training_data_illust.pdf"
+)

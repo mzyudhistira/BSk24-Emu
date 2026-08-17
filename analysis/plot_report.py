@@ -762,8 +762,7 @@ def plot_eps_dist_weight(path) -> None:
     Args:
         path (str): path to save the figure
     """
-    # fig, ax = plt.subplots(1, 2, figsize=plot_utils.latex_figure(ratio=(18, 8)))
-    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure(ratio=(18, 8)))
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure())
 
     grouped = dataset.epsilon_sigma_dataset(train_data="1")
     grouped["diff"] = (grouped["prediction_mean"] - grouped["target_mean"]) / grouped[
@@ -774,17 +773,8 @@ def plot_eps_dist_weight(path) -> None:
     heavy_nuclei = grouped[grouped["A"] > 50]["diff"]
     light_nuclei = grouped[grouped["A"] <= 50]["diff"]
 
-    # Plot each histogram on a different subplot
     sns.histplot(heavy_nuclei, stat="percent", ax=ax, label="Heavy")
-    # ax[0].set_title("Heavy Nuclei")
-    # ax[0].set_xlabel("")
-
     sns.histplot(light_nuclei, stat="percent", ax=ax, label="Light")
-    # ax[1].set_title("Light Nuclei")
-    # ax[1].set_ylabel("")
-    # ax[1].set_xlabel("")
-
-    fig.supxlabel(r"$\epsilon$")
 
     print(f"Percentage Heavy: {heavy_nuclei.shape[0] / grouped.shape[0] * 100:.2f}")
     print(f"Percentage Light: {light_nuclei.shape[0] / grouped.shape[0] * 100:.2f}")
@@ -1353,6 +1343,66 @@ def plot_param_dist(path: str) -> None:
 
     ax.set_xlabel(r" $\Delta p$ (\%)")
     ax.legend()
+
+    plot_utils.savefig(fig, ax, path)
+
+
+def plot_training_data_illust(path: str) -> None:
+    """Plot the test of parameters' distribution
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(
+        1, 2, figsize=plot_utils.latex_figure(ratio=(16, 6)), sharey=True, sharex=True
+    )
+
+    mass_table = pd.read_parquet("data/result/full_mt_grouped.parquet")
+    mask = (
+        np.random.rand(len(mass_table)) < 0.05
+    )  # Pick 10% random rows as a training illustration
+
+    mass_table["label"] = np.where(mask, "a", "b")
+
+    colour_map = {
+        "a": "#ff4000",
+        "b": "#d4d4d4",
+    }
+
+    sns.scatterplot(
+        data=mass_table,
+        x="N",
+        y="Z",
+        hue="label",
+        palette=colour_map,
+        s=0.5,
+        edgecolor="none",
+        ax=ax[0],
+        legend=False,
+    )
+    ax[0].set_title("Training Data")
+    ax[0].set_xlabel("")
+
+    colour_map = {
+        "a": "#ff4000",
+        "b": "#ff4000",
+    }  # Now make all same colour to show the test data are the whole nuclei
+
+    sns.scatterplot(
+        data=mass_table,
+        x="N",
+        y="Z",
+        hue="label",
+        palette=colour_map,
+        s=0.5,
+        edgecolor="none",
+        ax=ax[1],
+        legend=False,
+    )
+    ax[1].set_title("Test Data")
+    ax[1].set_xlabel("")
+
+    fig.supxlabel("N")
 
     plot_utils.savefig(fig, ax, path)
 
