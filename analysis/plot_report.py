@@ -1407,6 +1407,52 @@ def plot_training_data_illust(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def aggregate_illust(path: str) -> None:
+    """Plot the illustration of aggregated data
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure())
+
+    mass_table = pd.read_parquet("data/result/full_mt_grouped.parquet")
+
+    sns.scatterplot(
+        data=mass_table,
+        x="N",
+        y="Z",
+        color="#d4d4d4",
+        s=0.5,
+        edgecolor="none",
+        ax=ax,
+        legend=False,
+    )
+
+    sns.scatterplot(
+        data=mass_table[(mass_table["Z"] == 72) & (mass_table["N"] == 120)],
+        x="N",
+        y="Z",
+        color="#ff4000",
+        s=5,
+        edgecolor="none",
+        ax=ax,
+        legend=False,
+    )
+
+    plt.annotate(
+        r"$(120, 72)$",
+        (120, 72),
+        textcoords="offset points",
+        xytext=(5, 5),
+        fontsize=10,
+    )
+
+    ax.set_xlabel("N")
+    ax.set_xlabel("Z")
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_gap_n_asymmetry():
     fig, ax = plt.subplots(1, 2, figsize=(16, 6))
     data = dataset.build_gap_dataset()
