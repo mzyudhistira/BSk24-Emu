@@ -1447,9 +1447,6 @@ def aggregate_illust(path: str) -> None:
         fontsize=10,
     )
 
-    ax.set_xlabel("N")
-    ax.set_xlabel("Z")
-
     plot_utils.savefig(fig, ax, path)
 
 
