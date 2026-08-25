@@ -220,6 +220,30 @@ def plot_loss_convergence(path: str) -> None:
     plot_utils.savefig(fig, ax, path)
 
 
+def plot_loss_defence(path: str) -> None:
+    """Plot the convergence of loss and val loss of the initial model
+
+    Args:
+        path (str): path to save the figure
+    """
+    fig, ax = plt.subplots(1, 1, figsize=plot_utils.latex_figure())
+
+    # Load the loss plot
+    loss_data = np.loadtxt("data/result/2025-06-01 19:31_Dataset=100.0%/loss.dat")
+
+    val_loss_data = np.loadtxt(
+        "data/result/2025-06-01 19:31_Dataset=100.0%/val_loss.dat"
+    )
+
+    # Plot loss
+    ax.plot(loss_data, color="blue", lw=0.6)
+    ax.set_xlabel("Training Iteration")
+    ax.set_ylabel(r"$\text{MSE (MeV}^2)$")
+    ax.set_yscale("log")
+
+    plot_utils.savefig(fig, ax, path)
+
+
 def plot_robustness_samebase(path: str) -> None:
     """Plot the robustness test of the model with the same base configuration. Left plot shows the impact of additional neuron, while right plot shows the impact of dropout architecture
 

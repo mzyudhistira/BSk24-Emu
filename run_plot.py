@@ -145,4 +145,5 @@ plt.rcParams.update(
 # analysis.plot_report.plot_training_data_illust(
 #     "../thesis-defence/figs/training_data_illust.pdf"
 # )
-analysis.plot_report.aggregate_illust("../thesis-defence/figs/agg_illust.pdf")
+# analysis.plot_report.aggregate_illust("../thesis-defence/figs/agg_illust.pdf")
+analysis.plot_report.plot_loss_defence("../thesis-defence/figs/loss.pdf")
